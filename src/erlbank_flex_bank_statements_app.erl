@@ -29,8 +29,16 @@ start(_StartType, _StartArgs) ->
     start_cowboy(),
 
     database:init_database(),
+    check_is_set("ACCOUNTS_HOST"),
+    check_is_set("TRANSFERS_HOST"),
+
+    AccountNode = list_to_atom("accounts@" ++ os:getenv("ACCOUNTS_HOST")),
+    TransferNode = list_to_atom("transfers@" ++ os:getenv("TRANSFERS_HOST")),
 
     Res = erlbank_flex_bank_statements_sup:start_link(),
+
+    lager:info("Consuming accounts on: ~p~n", [AccountNode]),
+    lager:info("Consuming transfers on: ~p~n", [TransferNode]),
 
     Res.
 
