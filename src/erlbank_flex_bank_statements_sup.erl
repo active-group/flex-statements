@@ -32,7 +32,9 @@ init({AccountNode, TransferNode}) ->
     ChildSpecs = [#{id => formatter_sup,
                     start => {formatter_sup, start_link, []}},
                   #{id => accounts_consumer,
-                    start => {accounts_consumer, start_link, [AccountNode]}}],
+                    start => {accounts_consumer, start_link, [AccountNode]}},
+                  #{id => transfer_consumer,
+                    start => {transfer_consumer, start_link, [TransferNode]}}],
     {ok, {SupFlags, ChildSpecs}}.
 
 %% internal functions

@@ -35,7 +35,7 @@ start(_StartType, _StartArgs) ->
     AccountNode = list_to_atom("accounts@" ++ os:getenv("ACCOUNTS_HOST")),
     TransferNode = list_to_atom("transfers@" ++ os:getenv("TRANSFERS_HOST")),
 
-    Res = erlbank_flex_bank_statements_sup:start_link(),
+    Res = erlbank_flex_bank_statements_sup:start_link(AccountNode, TransferNode),
 
     lager:info("Consuming accounts on: ~p~n", [AccountNode]),
     lager:info("Consuming transfers on: ~p~n", [TransferNode]),
