@@ -18,7 +18,7 @@ update_pointer(State, Pointer) ->
 
 
 -spec persist_event(#event{}) -> ok.
-persist_event(#event{type = new_transfer_event, content = Content}) ->
+persist_event(#event{type = transfer_event, content = Content}) ->
     {TxId, _, _, _, _} = Content,
     lager:info("Persisting transfer with id ~p ~n", [TxId]),
     database:put_event(
