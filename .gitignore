@@ -1,1 +1,2 @@
-table_id.dets
+*.dets
+_build
