@@ -2,7 +2,11 @@
 
 -module(client).
 -include("data.hrl").
--export([open_account/2, transfer/3, statement/1]).
+-export([
+    % open_account/2, 
+    % transfer/3, 
+    statement/1
+]).
 
 
 
@@ -17,24 +21,24 @@ name_by_account_number(AccountNumber) ->
 
 %% opens an acocunt with a given name and surname.
 %% prints the result and the account number to stdout.
--spec open_account(string(), string()) -> ok.
-open_account(GivenName, Surname) ->
-    Account = business_logic:open_account(list_to_binary(GivenName),
-                                          list_to_binary(Surname)),
-    io:format("Account was successfully opened. Account number: ~p ~n", [Account#account.account_number]).
+% -spec open_account(string(), string()) -> ok.
+% open_account(GivenName, Surname) ->
+%     Account = business_logic:open_account(list_to_binary(GivenName),
+%                                           list_to_binary(Surname)),
+%     io:format("Account was successfully opened. Account number: ~p ~n", [Account#account.account_number]).
 
 
 %% transfers a given amount from the first account to the second account, identified
 %% by their account number. Prints the transfer-id when successful, else the error
 %% to stdout.
--spec transfer(account_number(), account_number(), money()) -> ok.
-transfer(SenderAccountNumber, ReceiverAccountNumber, Amount) ->
-    case business_logic:transfer(SenderAccountNumber, ReceiverAccountNumber, Amount) of
-        {ok, TransferId} ->
-            io:format("Transfer successful, id: ~p~n", [TransferId]);
-        {error, Error} ->
-            io:format("An error occured: ~p~n", [Error])
-        end.
+% -spec transfer(account_number(), account_number(), money()) -> ok.
+% transfer(SenderAccountNumber, ReceiverAccountNumber, Amount) ->
+%     case business_logic:transfer(SenderAccountNumber, ReceiverAccountNumber, Amount) of
+%         {ok, TransferId} ->
+%             io:format("Transfer successful, id: ~p~n", [TransferId]);
+%         {error, Error} ->
+%             io:format("An error occured: ~p~n", [Error])
+%         end.
 
 
 
