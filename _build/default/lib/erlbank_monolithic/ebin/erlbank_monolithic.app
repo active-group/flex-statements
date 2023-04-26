@@ -1,0 +1,13 @@
+{application,erlbank_monolithic,
+             [{description,"An OTP application"},
+              {vsn,"0.1.0"},
+              {registered,[]},
+              {mod,{erlbank_monolithic_app,[]}},
+              {applications,[kernel,inets,xmerl,stdlib,sasl,logstasher,
+                             cowboy]},
+              {env,[]},
+              {modules,[business_logic,client,database,date_formatter,
+                        erlbank_monolithic_app,erlbank_monolithic_sup,events,
+                        exchange_service,number_formatter,web_frontend]},
+              {licenses,["Apache 2.0"]},
+              {links,[]}]}.

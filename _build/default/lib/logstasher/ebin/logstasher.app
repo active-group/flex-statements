@@ -1,0 +1,12 @@
+{application,logstasher,
+             [{description,"The logstasher is Erlang Logger formatter for logstash"},
+              {vsn,"1.0.0"},
+              {registered,[]},
+              {mod,{logstasher_app,[]}},
+              {applications,[kernel,stdlib,jsx]},
+              {env,[]},
+              {modules,[logstasher,logstasher_app,logstasher_h,
+                        logstasher_sup]},
+              {licenses,["Apache-2.0"]},
+              {links,[{"github",
+                       "https://github.com/zotonic/logstasher.git"}]}]}.
