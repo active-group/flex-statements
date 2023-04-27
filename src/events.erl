@@ -3,6 +3,8 @@
 ,remember_account_event_number/1
 ,last_used_account_event_number/0
 ,handle_cast/2
+,handle_missing_events/1
+,handle_payload/1
 ,init/1]).
 -include("events.hrl").
 -include("data.hrl").
@@ -20,9 +22,25 @@
 handle_cast(Account = #account{}, _S) ->
     {noreply, business_logic:create_account(Account)};
 handle_cast(Person = #person{}, _S) ->
-    {noreply, business_logic:create_person(Person)}.
-    
+    {noreply, business_logic:create_person(Person)};
+handle_cast(#event{number = Number, payload = Payload}, _S) ->
+    handle_payload(Payload),
+    {noreply, remember_account_event_number(Number)}.
 
+handle_payload(#event{payload = Payload} ) -> 
+    io:format("Payload ~n~w", [Payload]),
+    case Payload of
+       #account{} -> business_logic:create_account(Payload);
+       #person{} -> business_logic:create_person(Payload)
+    end.
+
+-spec handle_missing_events(list(#event{})) -> ok.
+handle_missing_events([]) -> ok;
+handle_missing_events([First | Rest]) -> 
+    handle_payload(First), 
+    handle_missing_events(Rest)
+    .
+    
 init(InitialState) -> 
     {ok, InitialState}.
 

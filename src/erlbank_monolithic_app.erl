@@ -37,7 +37,8 @@ start(_StartType, _StartArgs) ->
     start_cowboy(),
     accounts_mock:start_demo_link(),
     {ok, Pid} = events:init_events() ,
-    subscribe(Pid, events:last_used_account_event_number(), account_service),
+    {ok, Events} = subscribe(Pid, events:last_used_account_event_number(), account_service),
+    events:handle_missing_events(Events),
     erlbank_monolithic_sup:start_link()
     .
 

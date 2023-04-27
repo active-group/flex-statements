@@ -1,6 +1,10 @@
 -module(events).
 -export([init_events/0, put_event/1, get_all_events/0, get_events_from/1
+,remember_account_event_number/1
+,last_used_account_event_number/0
 ,handle_cast/2
+,handle_missing_events/1
+,handle_payload/1
 ,init/1]).
 -include("events.hrl").
 -include("data.hrl").
@@ -18,9 +22,25 @@
 handle_cast(Account = #account{}, _S) ->
     {noreply, business_logic:create_account(Account)};
 handle_cast(Person = #person{}, _S) ->
-    {noreply, business_logic:create_person(Person)}.
-    
+    {noreply, business_logic:create_person(Person)};
+handle_cast(#event{number = Number, payload = Payload}, _S) ->
+    handle_payload(Payload),
+    {noreply, remember_account_event_number(Number)}.
 
+handle_payload(#event{payload = Payload} ) -> 
+    io:format("Payload ~n~w", [Payload]),
+    case Payload of
+       #account{} -> business_logic:create_account(Payload);
+       #person{} -> business_logic:create_person(Payload)
+    end.
+
+-spec handle_missing_events(list(#event{})) -> ok.
+handle_missing_events([]) -> ok;
+handle_missing_events([First | Rest]) -> 
+    handle_payload(First), 
+    handle_missing_events(Rest)
+    .
+    
 init(InitialState) -> 
     {ok, InitialState}.
 
@@ -46,6 +66,17 @@ put_event(Payload) ->
 -spec deserialize_event({non_neg_integer(), term()}) -> #event{}.
 deserialize_event({Number, Payload}) ->
     #event{number = Number, payload = Payload}.
+
+-spec last_used_account_event_number() -> [#event{}].
+
+last_used_account_event_number() ->
+    dets:lookup(table_id, account_event).
+
+-spec remember_account_event_number(non_neg_integer()) -> ok.
+remember_account_event_number(Id) ->
+    dets:insert(table_id, account_event, Id).
+
+
 
 -spec get_all_events() -> [#event{}].
 get_all_events() ->
