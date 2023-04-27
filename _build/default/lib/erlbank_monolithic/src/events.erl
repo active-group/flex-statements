@@ -1,14 +1,37 @@
 -module(events).
--export([init_events/0, put_event/1, get_all_events/0, get_events_from/1]).
+-export([init_events/0, put_event/1, get_all_events/0, get_events_from/1
+,handle_cast/2
+,init/1]).
 -include("events.hrl").
+-include("data.hrl").
 
+-behaviour(gen_server).
 % call after database: init_database/0
 
-init_events() ->
+-type state() :: [#event{}].
+
+-spec init(state()) -> {ok, state()}.
+
+-type message() :: #account{} | #person{}.
+-spec handle_cast(message(), state()) -> {noreply, state()}.
+
+handle_cast(Account = #account{}, _S) ->
+    {noreply, business_logic:create_account(Account)};
+handle_cast(Person = #person{}, _S) ->
+    {noreply, business_logic:create_person(Person)}.
+    
+
+init(InitialState) -> 
+    {ok, InitialState}.
+
+
+
+init_events()->
     dets:close(event),
     file:delete("event.dets"),
     {ok, event} = dets:open_file(event, [{type, set}, {file, "event.dets"}]),
-    dets:insert(table_id, {event, 0}).
+    dets:insert(table_id, {event, 0}),
+    gen_server:start(?MODULE, get_all_events(), [{debug, [trace]}]).
 
 
 -spec unique_event_number() -> non_neg_integer().

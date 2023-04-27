@@ -5,7 +5,9 @@
 -export([
 open_account/2, 
 get_account/1, 
+create_account/1,
 get_person/1, 
+create_person/1,
 transfer/3, 
 sort_transfers/1, 
 get_transfers/1 ]).
@@ -33,6 +35,11 @@ make_person(GivenName, Surname) ->
     database:put_person(Person),
     Person.
 
+ -spec create_person(#person{}) -> #person{}.
+create_person(Person) ->
+    database:put_person(Person),
+    Person.
+
 -spec get_person(unique_id()) -> {ok, #person{} | {error, any()}}.
 get_person(Id) -> database:get_person(Id).
 
@@ -44,6 +51,11 @@ make_account(Person) ->
                    amount = 1000},
     database:put_account(Account),
     Account.
+
+-spec create_account(#account{}) -> #account{}.
+create_account(Account) ->
+      database:put_account(Account),
+      Account.
 
 -spec get_transfers(unique_id()) -> list(#transfer{}).
 get_transfers(Id) ->
