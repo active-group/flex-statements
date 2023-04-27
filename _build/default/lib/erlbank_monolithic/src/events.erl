@@ -5,6 +5,7 @@
 ,handle_cast/2
 ,handle_missing_events/1
 ,handle_payload/1
+,get_transfer_feed/0
 ,init/1]).
 -include("events.hrl").
 -include("data.hrl").
@@ -23,15 +24,18 @@ handle_cast(Account = #account{}, _S) ->
     {noreply, business_logic:create_account(Account)};
 handle_cast(Person = #person{}, _S) ->
     {noreply, business_logic:create_person(Person)};
-handle_cast(#event{number = Number, payload = Payload}, _S) ->
-    handle_payload(Payload),
+handle_cast(Event = #event{number = Number, payload = _Payload}, _S) ->
+    handle_payload(Event),
     {noreply, remember_account_event_number(Number)}.
 
-handle_payload(#event{payload = Payload} ) -> 
+handle_payload(#event{number = Number, payload = Payload} ) -> 
     io:format("Payload ~n~w", [Payload]),
     case Payload of
        #account{} -> business_logic:create_account(Payload);
-       #person{} -> business_logic:create_person(Payload)
+       #person{} -> business_logic:create_person(Payload);
+       #new_transfer_event{id = Id , timestamp = Timestamp , from_account_number = From_account_number, to_account_number = To_account_number, amount = Amount} -> remember_transfer_event_number(Number),
+       business_logic:create_transfer(#transfer{id = Id, timestamp = Timestamp, from_account_number = From_account_number, to_account_number = To_account_number, amount = Amount});
+       true -> ok
     end.
 
 -spec handle_missing_events(list(#event{})) -> ok.
@@ -40,7 +44,13 @@ handle_missing_events([First | Rest]) ->
     handle_payload(First), 
     handle_missing_events(Rest)
     .
-    
+
+-spec get_transfer_feed() -> {reply, list(#event{}) } .
+ 
+get_transfer_feed() -> 
+    gen_server:call(transfer_feed, {events, events:last_used_transfer_number() +1})
+    .
+
 init(InitialState) -> 
     {ok, InitialState}.
 
@@ -75,6 +85,11 @@ last_used_account_event_number() ->
 -spec remember_account_event_number(non_neg_integer()) -> ok.
 remember_account_event_number(Id) ->
     dets:insert(table_id, account_event, Id).
+
+
+-spec remember_transfer_event_number(non_neg_integer()) -> ok.
+remember_transfer_event_number(Id) ->
+    dets:insert(table_id, transfer_event, Id).
 
 
 

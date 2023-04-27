@@ -16,3 +16,9 @@
      from_account_number :: account_number(),
      to_account_number :: account_number(),
      amount :: money()}).
+-record(new_transfer_event, 
+    {id :: unique_id(), 
+     timestamp :: erlang:timestamp(), 
+     from_account_number :: account_number(),
+     to_account_number :: account_number(),
+     amount :: money()}).

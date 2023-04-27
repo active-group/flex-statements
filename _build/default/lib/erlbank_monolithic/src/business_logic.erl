@@ -8,6 +8,7 @@ get_account/1,
 create_account/1,
 get_person/1, 
 create_person/1,
+create_transfer/1,
 transfer/3, 
 sort_transfers/1, 
 get_transfers/1 ]).
@@ -60,6 +61,11 @@ create_account(Account) ->
 -spec get_transfers(unique_id()) -> list(#transfer{}).
 get_transfers(Id) ->
      database:get_all_transfers(Id).
+
+-spec create_transfer(#transfer{}) -> #transfer{}.
+
+create_transfer(Transfer) ->
+  database:put_transfer(Transfer).
 
 %% Takes a sender & receiver account number and an amount and transfers 
 %% that amount from sender to receiver.
