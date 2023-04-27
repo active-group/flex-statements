@@ -33,8 +33,8 @@ start(_StartType, _StartArgs) ->
     database:init_database(),
     start_cowboy(),
     accounts_mock:start_demo_link(),
-    subscribe(self(), account_service),
-    events:init_events(),
+    {ok, Pid} = events:init_events() ,
+    subscribe(Pid, account_service),
     erlbank_monolithic_sup:start_link()
     .
 
