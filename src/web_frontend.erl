@@ -197,7 +197,7 @@ init(Request, request_statement) ->
                binary_to_list(maps:get(<<"statement_format">>, KeyValues))),
 
     logger:info("Bank statement request: account number ~p~n", [AccountNumber]),
-    {reply , Events} = events:get_transfer_feed(),
+    Events = events:get_transfer_feed(),
     events:handle_missing_events(Events),
     Ret = business_logic:get_account(AccountNumber),
     KnowsCurrency = exchange_service:knows_currency(Currency),

@@ -2,7 +2,9 @@
 -export([init_events/0, put_event/1, get_all_events/0, get_events_from/1
 ,remember_account_event_number/1
 ,last_used_account_event_number/0
+,last_used_transfer_event_number/0
 ,handle_cast/2
+,handle_call/3
 ,handle_missing_events/1
 ,handle_payload/1
 ,get_transfer_feed/0
@@ -28,14 +30,19 @@ handle_cast(Event = #event{number = Number, payload = _Payload}, _S) ->
     handle_payload(Event),
     {noreply, remember_account_event_number(Number)}.
 
+handle_call(Msg, _From, State) ->
+    {reply, unhandled, State}.
+
+handle_payload({event, Number, new_transfer_event, {Id, Timestamp, From_account_number, To_account_number, Amount}}) ->
+    remember_transfer_event_number(Number),
+    business_logic:create_transfer(#transfer{id = Id, timestamp = Timestamp, from_account_number = From_account_number, to_account_number = To_account_number, amount = Amount});
+
 handle_payload(#event{number = Number, payload = Payload} ) -> 
     io:format("Payload ~n~w", [Payload]),
     case Payload of
        #account{} -> business_logic:create_account(Payload);
        #person{} -> business_logic:create_person(Payload);
-       #new_transfer_event{id = Id , timestamp = Timestamp , from_account_number = From_account_number, to_account_number = To_account_number, amount = Amount} -> remember_transfer_event_number(Number),
-       business_logic:create_transfer(#transfer{id = Id, timestamp = Timestamp, from_account_number = From_account_number, to_account_number = To_account_number, amount = Amount});
-       true -> ok
+       _ -> ok
     end.
 
 -spec handle_missing_events(list(#event{})) -> ok.
@@ -46,15 +53,11 @@ handle_missing_events([First | Rest]) ->
     .
 
 -spec get_transfer_feed() -> {reply, list(#event{}) } .
- 
 get_transfer_feed() -> 
-    gen_server:call(transfer_feed, {events, events:last_used_transfer_number() +1})
-    .
+    gen_server:call(transfers_updater, update).
 
 init(InitialState) -> 
     {ok, InitialState}.
-
-
 
 init_events()->
     dets:close(event),
@@ -78,20 +81,24 @@ deserialize_event({Number, Payload}) ->
     #event{number = Number, payload = Payload}.
 
 -spec last_used_account_event_number() -> [#event{}].
-
 last_used_account_event_number() ->
     dets:lookup(table_id, account_event).
 
+-spec last_used_transfer_event_number() -> non_neg_integer().
+last_used_transfer_event_number() ->
+    case dets:lookup(table_id, transfer_event) of
+        [] -> 0;
+        [{transfer_event, N}] -> N
+    end.
+
 -spec remember_account_event_number(non_neg_integer()) -> ok.
 remember_account_event_number(Id) ->
-    dets:insert(table_id, account_event, Id).
+    dets:insert(table_id, {account_event, Id}).
 
 
 -spec remember_transfer_event_number(non_neg_integer()) -> ok.
 remember_transfer_event_number(Id) ->
-    dets:insert(table_id, transfer_event, Id).
-
-
+    dets:insert(table_id, {transfer_event, Id}).
 
 -spec get_all_events() -> [#event{}].
 get_all_events() ->
