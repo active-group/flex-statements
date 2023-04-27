@@ -26,7 +26,7 @@ handle_cast(Account = #account{}, _S) ->
     {noreply, business_logic:create_account(Account)};
 handle_cast(Person = #person{}, _S) ->
     {noreply, business_logic:create_person(Person)};
-handle_cast(Event = #event{number = Number, payload = _Payload}, _S) ->
+handle_cast({publish, Event = #event{number = Number, payload = _Payload}}, _S) ->
     handle_payload(Event),
     {noreply, remember_account_event_number(Number)}.
 
