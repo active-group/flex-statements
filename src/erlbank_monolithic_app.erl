@@ -44,7 +44,7 @@ start(_StartType, _StartArgs) ->
                           node()),
     database:init_database(),
     start_cowboy(),
-    accounts_mock:start_demo_link(),
+    % accounts_mock:start_demo_link(),
     {ok, Pid} = events:init_events() ,
     {ok, _UpdaterPid} = transfer_feed:start_link(TransferNode),
     {ok, Events} = subscribe(Pid, events:last_used_account_event_number(), {account_service, AccountNode}),
