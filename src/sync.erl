@@ -5,9 +5,8 @@
     accountServiceId :: integer(),
     transferServiceId :: integer()}).
 
--spec start(string(),string()) -> {ok,pid()}.
 
--spec init(string()) -> {ok, #lastServiceIds()}.
+-spec init(string()) -> {ok, #lastServiceIds{}}.
 init(LastServiceIds) ->
     {ok, #lastServiceIds{accountServiceId = 0, transferServiceId = 0}}.
 
