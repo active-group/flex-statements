@@ -65,8 +65,7 @@ index() ->
 %% given by account.
 -spec name_by_account(#account{}) -> string().
 name_by_account(Account) ->
-    {ok, Person}  = business_logic:get_person(Account#account.person_id),
-    io_lib:format("~s ~s", [Person#person.given_name, Person#person.surname]).
+    io_lib:format("~s ~s", [Account#account.given_name, Account#account.surname]).
 
 head_template() ->
 "<p> Name: ~s </p>
@@ -137,8 +136,7 @@ statement(Account, Transfers, Currency, Format) ->
 -spec name_by_account_number(account_number()) -> string().
 name_by_account_number(AccountNumber) ->
     {ok, Account} = business_logic:get_account(AccountNumber),
-    {ok, Person}  = business_logic:get_person(Account#account.person_id),
-    binary_to_list(Person#person.given_name) ++ " " ++ binary_to_list(Person#person.surname).
+    binary_to_list(Account#account.given_name) ++ " " ++ binary_to_list(Account#account.surname).
 
 
 %% /statements/request
