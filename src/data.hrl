@@ -17,3 +17,14 @@
      from_account_number :: account_number(),
      to_account_number :: account_number(),
      amount :: money()}).
+% ####### Events
+% 
+
+-type eventType() :: account_created.
+
+-record(event,
+    {id :: unique_id(),
+     eventType :: eventType(),
+     account_number :: account_number(),
+     givenName :: string(),
+     surname :: string()}).
