@@ -30,11 +30,13 @@ get_transfers(Id) ->
 %% Returns {ok, tid}, where tid is the id of the stored transfer
 %% or {error, insufficient_funds} when there is not enough money in the sender account.
 
--spec transfer(account_number(), account_number(), money()) -> 
+-spec transfer(#transferEvent{}) ->
      {error, sender_account_not_found | receiver_account_not_found | insufficient_funds}
    | {ok, unique_id()}.
-transfer(SenderAccountNumber, ReceiverAccountNumber, Amount) ->
-
+transfer(#transferEvent{ accountIdSender = SenderAccountNumber,
+  accountIdReceiver = ReceiverAccountNumber,
+  amount = Amount,
+  timestamp = Timestamp}) ->
     TransferFunction =
       fun() -> 
         MaybeAccountSender = database:get_account(SenderAccountNumber),
@@ -51,7 +53,7 @@ transfer(SenderAccountNumber, ReceiverAccountNumber, Amount) ->
                     AccountSenderAmount - Amount >= 0 ->
                         TransferId = database:unique_transfer_id(),
                         Transfer = #transfer{id = TransferId,
-                                            timestamp = erlang:timestamp(),
+                                            timestamp = Timestamp,
                                             from_account_number = SenderAccountNumber,
                                             to_account_number = ReceiverAccountNumber,
                                             amount = Amount},

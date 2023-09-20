@@ -28,6 +28,7 @@
 -record(transferEvent,{
     source :: transfer_service,
     eventId :: integer(),
+    amount :: number(),
     accountIdSender :: integer(),
     accountIdReceiver :: integer(),
     timestamp :: erlang:timestamp()}).
