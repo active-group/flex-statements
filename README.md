@@ -68,7 +68,7 @@ rebar3 release
 
 ## Push-Service
 
-Wir nehmen Events an.
+Wir nehmen als service name `statements` Events an.
 * unter dem Atom `accounts` erwarten wir ein Event nach der Definition aus
 https://github.com/active-group/flex-accounts/blob/2023-09/README.md
 
