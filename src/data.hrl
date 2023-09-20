@@ -10,6 +10,7 @@
     {account_number :: account_number(),
      person_id :: unique_id(),
      amount :: money()}).
+% ######################################################################
 -record(transfer, 
     {id :: unique_id(), 
      timestamp :: erlang:timestamp(), 
