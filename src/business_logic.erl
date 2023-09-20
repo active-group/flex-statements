@@ -2,26 +2,21 @@
 
 -module(business_logic).
 -include("data.hrl").
--export([open_account/2, get_account/1, get_person/1, transfer/3, sort_transfers/1, get_transfers/1 ]).
+-export([get_account/1, transfer/3, sort_transfers/1, get_transfers/1 ]).
 
 
 -spec get_account(account_number()) -> {ok, #account{}} | {error, any()}.
 get_account(AccountNumber) -> database:get_account(AccountNumber).
 
--spec make_person(binary(), binary()) -> #person{}.
-make_person(GivenName, Surname) ->
-    PersonId = database:unique_person_id(),
-    Person = #person{id = PersonId,
-                   given_name = GivenName,
-                   surname = Surname},
-    database:put_person(Person),
-    Person.
 
--spec get_person(unique_id()) -> {ok, #person{} | {error, any()}}.
-get_person(Id) -> database:get_person(Id).
-
--spec make_account(#account{}) -> #account{}.
-make_account(Account) ->
+-spec make_account(#accountEvent{}) -> #account{}.
+make_account(AccountEvent) ->
+    Account = #account{
+      account_number = AccountEvent#accountEvent.account_number,
+      amount = 0,
+      given_name = AccountEvent#accountEvent.givenName,
+      surname = AccountEvent#accountEvent.surname
+      },
     database:put_account(Account),
     Account.
 
