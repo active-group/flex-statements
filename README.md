@@ -69,8 +69,8 @@ rebar3 release
 ## Push-Service
 
 Wir nehmen Events an.
-* unter dem Atom `account_created` erwarten wir ein Event nach der Definition aus
+* unter dem Atom `accounts` erwarten wir ein Event nach der Definition aus
 https://github.com/active-group/flex-accounts/blob/2023-09/README.md
 
-* unter dem Atom `transfer_created` erwarten wir ein Event nach der Definition aus
+* unter dem Atom `transfers` erwarten wir ein Event nach der Definition aus
 https://github.com/active-group/flex-transfers/blob/main/README.md
