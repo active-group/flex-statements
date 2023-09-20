@@ -2,14 +2,11 @@
 -type account_number() :: integer().
 -type money() :: number().
 
--record(person, 
-    {id :: unique_id(), 
-     given_name :: binary(),
-     surname :: binary()}).
 -record(account,
     {account_number :: account_number(),
-     person_id :: unique_id(),
-     amount :: money()}).
+     amount :: money(), 
+     given_name :: binary(),
+     surname :: binary()}).
 % ######################################################################
 -record(transfer, 
     {id :: unique_id(), 
@@ -20,11 +17,16 @@
 % ####### Events
 % 
 
--type eventType() :: account_created.
 
--record(event,
+-record(accountEvent,
     {id :: unique_id(),
-     eventType :: eventType(),
+     eventType :: account_created,
      account_number :: account_number(),
      givenName :: string(),
      surname :: string()}).
+-record(transferEvent,{
+    source :: transfer_service,
+    eventId :: integer(),
+    accountIdSender :: integer(),
+    accountIdReceiver :: integer(),
+    timestamp :: erlang:timestamp()}).
