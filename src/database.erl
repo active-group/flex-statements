@@ -31,7 +31,7 @@ create_tables() ->
 
 init_database() ->
     close_tables(),
-    destroy_tables(),
+    %destroy_tables(),
     create_tables(),
     ok.
 
