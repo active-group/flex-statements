@@ -24,6 +24,7 @@
      account_number :: account_number(),
      givenName :: string(),
      surname :: string()}).
+    
 -record(transferEvent,{
     source :: transfer_service,
     eventId :: integer(),
