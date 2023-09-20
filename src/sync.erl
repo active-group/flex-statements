@@ -1,6 +1,19 @@
 -module(sync).
 -behavior(gen_server).
 
+interval_milliseconds()-> 30000.
+initTrigger()->
+  timer:send_interval(interval_milliseconds(), interval),
+  {ok}.
+
+
+handle_info(interval)->
+  registerForEvents(),
+  {noreply}.
+
+registerForEvents() ->
+  toDo. %senden unserer Pid an den Acountservice mit der letzten bekanten EventId, das gleiche für Transfers
+
 -record(lastServiceIds,{
     accountServiceId :: integer(),
     transferServiceId :: integer()}).

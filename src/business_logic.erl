@@ -2,7 +2,7 @@
 
 -module(business_logic).
 -include("data.hrl").
--export([get_account/1, transfer/3, sort_transfers/1, get_transfers/1 ]).
+-export([get_account/1, transfer/1, sort_transfers/1, get_transfers/1 ]).
 
 
 -spec get_account(account_number()) -> {ok, #account{}} | {error, any()}.
