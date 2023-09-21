@@ -89,7 +89,7 @@ footer_template() ->
 
 -spec head(#account{}, string(), number_formatter:locale()) -> string().
 head(Account, Currency, Format) ->
-Amount = amount_to_string(Account#account.amount, Currency, Format),
+Amount = amount_to_string(business_logic:get_amount(Account#account.account_number), Currency, Format),
 Name =  name_by_account(Account),
 io_lib:format(head_template(), [Name, Amount]).
               

@@ -27,11 +27,11 @@ get_transfers(Id) ->
 get_amount(AccountNumber) ->
   List = get_transfers(AccountNumber),
   logger:info("~p~n",[List]),
-  Amounts = lists:map(fun (#transfer{amount=Amount,from_account_number=From}) -> {
+  Amounts = lists:map(fun (#transfer{amount=Amount,from_account_number=From}) -> 
     if From == AccountNumber -> 0 - Amount;
     true -> Amount
     end
-  } end,List),
+  end,List),
   logger:info("Amounts : ~p~n",[Amounts]),
   lists:sum(Amounts).
 
