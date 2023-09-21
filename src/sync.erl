@@ -18,7 +18,7 @@ initTrigger()->
 
 handle_info(_interval,State)->
   registerForEvents(State),
-  {noreply}.
+  {noreply,State}.
 
 registerForEvents(#state{
     accountLastEventId = AccountLastEventId,
@@ -26,15 +26,15 @@ registerForEvents(#state{
     accountsServiceName = AccountsServiceName,
     transfersServiceName= TransfersServiceName}) ->
   % bei Account Service nachfragen
-  gen_server:cast(AccountsServiceName,get_account_events_since,[#getLastType{
+  gen_server:cast(AccountsServiceName,{get_account_events_since,#getLastType{
         since= AccountLastEventId,
         receiver_pid= self()
-    }]),
+    }}),
   % bei Transfer Service nachfragen
-  gen_server:cast(TransfersServiceName,get_transfer_events_since,[#getLastType{
+  gen_server:cast(TransfersServiceName,{get_transfer_events_since,#getLastType{
             since= TransferLastEventId,
             receiver_pid= self()
-        }]).
+        }}).
 
 
 
@@ -48,7 +48,7 @@ init(State) ->
 start(OwnServiceName, AccountsServiceName, TransfersServiceName) ->
     logger:info("Starting own-service ~n"),
     gen_server:start(
-                    [local, OwnServiceName],
+                    {local, OwnServiceName},
                     sync,
                     #state{
                         accountLastEventId = 0, 
@@ -73,9 +73,14 @@ process_message(State,#accountEvent{id=Id}=Message) ->
     State#state{accountLastEventId=Id};
 process_message(State,#transferEvent{eventId=Id}=Message) ->
     business_logic:transfer(Message),
-    State#state{transferLastEventId=Id}.
+    State#state{transferLastEventId=Id};
+process_message(State,Message)->
+    logger:info("Unknown Event ~p~n",[Message]),
+    State.
+
 
 handle_cast(Message, State)  ->
+    logger:info("---->New Event ~p~n",[Message]),
     {noreply, process_message(State,Message)}.
 
 handle_call(_Request, _From,State) -> {noreply,State}.
