@@ -27,7 +27,7 @@ transfer_test(_) ->
     %% Test case where sender account not found
     database:stub_get_account(SenderAccountNumber, {error, not_found}),
     database:stub_get_account(ReceiverAccountNumber, {ok, #account{}}),
-    ?assertEqual({error, sender_account_not_found}, business_logic:transfer(#transferEvent{
+    ?assertEqual({error, sender_account_not_found}, business_logic:transfer(#transfer_event{
         accountIdSender = SenderAccountNumber,
         accountIdReceiver = ReceiverAccountNumber,
         amount = Amount,
@@ -37,7 +37,7 @@ transfer_test(_) ->
     %% Test case where receiver account not found
     database:stub_get_account(SenderAccountNumber, {ok, #account{}}),
     database:stub_get_account(ReceiverAccountNumber, {error, not_found}),
-    ?assertEqual({error, receiver_account_not_found}, business_logic:transfer(#transferEvent{
+    ?assertEqual({error, receiver_account_not_found}, business_logic:transfer(#transfer_event{
         accountIdSender = SenderAccountNumber,
         accountIdReceiver = ReceiverAccountNumber,
         amount = Amount,
@@ -47,7 +47,7 @@ transfer_test(_) ->
     %% Test case where sender has insufficient funds
     database:stub_get_account(SenderAccountNumber, {ok, #account{amount = 50}}),
     database:stub_get_account(ReceiverAccountNumber, {ok, #account{}}),
-    ?assertEqual({error, insufficient_funds}, business_logic:transfer(#transferEvent{
+    ?assertEqual({error, insufficient_funds}, business_logic:transfer(#transfer_event{
         accountIdSender = SenderAccountNumber,
         accountIdReceiver = ReceiverAccountNumber,
         amount = Amount,
@@ -58,7 +58,7 @@ transfer_test(_) ->
     database:stub_get_account(SenderAccountNumber, {ok, #account{amount = 200}}),
     database:stub_get_account(ReceiverAccountNumber, {ok, #account{}}),
     database:stub_unique_transfer_id(123),
-    ?assertEqual({ok, 123}, business_logic:transfer(#transferEvent{
+    ?assertEqual({ok, 123}, business_logic:transfer(#transfer_event{
         accountIdSender = SenderAccountNumber,
         accountIdReceiver = ReceiverAccountNumber,
         amount = Amount,

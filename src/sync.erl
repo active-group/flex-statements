@@ -10,7 +10,7 @@
     transfersServiceName :: string()
 }).
 
-interval_milliseconds()-> 30000.
+interval_milliseconds()-> 10000.
 initTrigger()->
   timer:send_interval(interval_milliseconds(), interval),
   {ok}.
@@ -26,15 +26,17 @@ registerForEvents(#state{
     accountsServiceName = AccountsServiceName,
     transfersServiceName= TransfersServiceName}) ->
   % bei Account Service nachfragen
-  gen_server:cast(AccountsServiceName,{get_account_events_since,#getLastType{
-        since= AccountLastEventId,
-        receiver_pid= self()
-    }}),
+  MessageAccounts = #get_account_events_since{
+    since= AccountLastEventId,
+    receiver_pid= self()
+  },
+  logger:info("Sending ~p to ~p~n",[MessageAccounts,AccountsServiceName]),
+  gen_server:cast(AccountsServiceName,MessageAccounts).
   % bei Transfer Service nachfragen
-  gen_server:cast(TransfersServiceName,{get_transfer_events_since,#getLastType{
-            since= TransferLastEventId,
-            receiver_pid= self()
-        }}).
+%   gen_server:cast(TransfersServiceName,{get_transfer_events_since,#getLastType{
+%             since= TransferLastEventId,
+%             receiver_pid= self()
+%         }}).
 
 
 
@@ -58,7 +60,7 @@ start(OwnServiceName, AccountsServiceName, TransfersServiceName) ->
                     },
                     [{debug, [trace]}]).
 
-handle_account_event(State,#accountEvent{id=Id}=Message)->
+handle_account_event(State,#account_event{id=Id}=Message)->
 
     business_logic:make_account(Message).
 handle_transfer_event(State,Message)->ok.
@@ -68,11 +70,11 @@ handle_transfer_event(State,Message)->ok.
 % unter dem Atom accounts erwarten wir ein Event nach der Definition aus https://github.com/active-group/flex-accounts/blob/2023-09/README.md
 % unter dem Atom transfers erwarten wir ein Event nach der Definition aus https://github.com/active-group/flex-transfers/blob/main/README.md
 % 
-process_message(State,#accountEvent{id=Id}=Message) ->
+process_message(State,#account_event{id=Id}=Message) ->
     Ret = business_logic:make_account(Message),
     logger:info("Account created~p~n",[Ret]),
     State#state{accountLastEventId=Id};
-process_message(State,#transferEvent{eventId=Id}=Message) ->
+process_message(State,#transfer_event{eventId=Id}=Message) ->
     Ret = business_logic:transfer(Message),
     logger:info("Transfer created~p~n",[Ret]),
     State#state{transferLastEventId=Id};

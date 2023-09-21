@@ -9,13 +9,13 @@
 get_account(AccountNumber) -> database:get_account(AccountNumber).
 
 
--spec make_account(#accountEvent{}) -> #account{}.
-make_account(AccountEvent) ->
+-spec make_account(#account_event{}) -> #account{}.
+make_account(Account_event) ->
     Account = #account{
-      account_number = AccountEvent#accountEvent.account_number,
+      account_number = Account_event#account_event.account_number,
       amount = 0,
-      given_name = AccountEvent#accountEvent.givenName,
-      surname = AccountEvent#accountEvent.surname
+      given_name = Account_event#account_event.givenName,
+      surname = Account_event#account_event.surname
       },
     database:put_account(Account),
     Account.
@@ -41,10 +41,10 @@ get_amount(AccountNumber) ->
 %% Returns {ok, tid}, where tid is the id of the stored transfer
 %% or {error, insufficient_funds} when there is not enough money in the sender account.
 
--spec transfer(#transferEvent{}) ->
+-spec transfer(#transfer_event{}) ->
      {error, sender_account_not_found | receiver_account_not_found | insufficient_funds}
    | {ok, unique_id()}.
-transfer(#transferEvent{ accountIdSender = SenderAccountNumber,
+transfer(#transfer_event{ accountIdSender = SenderAccountNumber,
   accountIdReceiver = ReceiverAccountNumber,
   amount = Amount,
   timestamp = Timestamp}) ->

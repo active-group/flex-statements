@@ -17,14 +17,14 @@
 % ####### Events
 % 
 
--record(accountEvent,
+-record(account_event,
     {id :: unique_id(),
      eventType :: account_created,
      account_number :: account_number(),
      givenName :: string(),
      surname :: string()}).
     
--record(transferEvent,{
+-record(transfer_event,{
     source :: transfer_service,
     eventId :: integer(),
     amount :: number(),
@@ -32,9 +32,13 @@
     accountIdReceiver :: integer(),
     timestamp :: erlang:timestamp()}).
 
--record(getLastType,{
+-record(get_account_events_since,{
+    since :: non_neg_integer(),
+    receiver_pid :: pid()
+}).
+-record(get_transfer_events_since,{
     since :: non_neg_integer(),
     receiver_pid :: pid()
 }).
 
--type event() :: #accountEvent{} | #transferEvent{}.
+-type event() :: #account_event{} | #transfer_event{}.
