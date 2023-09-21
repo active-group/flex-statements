@@ -23,7 +23,7 @@ start(_StartType, _StartArgs) ->
     AccountNode = node_util:node_from_env(accounts, "ACCOUNTS_HOST"),
     TransferNode = node_util:node_from_env(transfers, "TRANSFERS_HOST"),
 
-    sync:start(wir,accounts,transfers),
+    sync:start(statements,AccountNode,TransferNode),
 
     Res = erlbank_flex_statements_sup:start_link(),
     logger:info("Started account feed: ~p~n", [node()]),
