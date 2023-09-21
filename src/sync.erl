@@ -33,6 +33,11 @@ registerForEvents(#state{
   logger:info("Sending ~p to ~p~n",[MessageAccounts,AccountsServiceName]),
   gen_server:cast(AccountsServiceName,MessageAccounts),
   % bei Transfer Service nachfragen
+  % 
+  logger:info("Sending ~p to ~p~n",[#get_transfer_events_since{
+    since= TransferLastEventId,
+    receiver_pid= self()
+},TransfersServiceName]),
   gen_server:cast(TransfersServiceName,#get_transfer_events_since{
             since= TransferLastEventId,
             receiver_pid= self()
