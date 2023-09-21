@@ -10,7 +10,7 @@
     transfersServiceName :: string()
 }).
 
-interval_milliseconds()-> 10000.
+interval_milliseconds()-> 30000.
 initTrigger()->
   timer:send_interval(interval_milliseconds(), interval),
   {ok}.
@@ -44,6 +44,7 @@ registerForEvents(#state{
 init(State) ->
     initTrigger(),
     logger:info("Started own-service ~p~n",[self()]),
+    registerForEvents(State),
     {ok, State}.
 
 -spec start(string(),string(),string()) -> {ok,pid()}.
