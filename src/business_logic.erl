@@ -2,7 +2,7 @@
 
 -module(business_logic).
 -include("data.hrl").
--export([get_account/1, transfer/1, sort_transfers/1, get_transfers/1, make_account/1 ]).
+-export([get_account/1, transfer/1, sort_transfers/1, get_transfers/1, make_account/1, get_amount/1 ]).
 
 
 -spec get_account(account_number()) -> {ok, #account{}} | {error, any()}.
@@ -23,6 +23,17 @@ make_account(AccountEvent) ->
 -spec get_transfers(unique_id()) -> list(#transfer{}).
 get_transfers(Id) ->
      database:get_all_transfers(Id).
+  
+get_amount(AccountNumber) ->
+  List = get_transfers(AccountNumber),
+  logger:info("~p~n",[List]),
+  Amounts = lists:map(fun (#transfer{amount=Amount,from_account_number=From}) -> {
+    if From == AccountNumber -> 0 - Amount;
+    true -> Amount
+    end
+  } end,List),
+  logger:info("Amounts : ~p~n",[Amounts]),
+  lists:sum(Amounts).
 
 %% Takes a sender & receiver account number and an amount and transfers 
 %% that amount from sender to receiver.
