@@ -55,7 +55,7 @@ read_all(Table, Deserialize) ->
 put_account(#account{account_number = AccountNumber, amount = Amount, given_name = GivenName, surname = Surname}) ->
     write(account, {AccountNumber, Amount, GivenName, Surname}).
 
-deserialize_account({AccountNumber, Amount, given_name = GivenName, surname = Surname}) ->
+deserialize_account({AccountNumber, Amount, GivenName, Surname}) ->
     #account{account_number = AccountNumber, amount = Amount, given_name = GivenName, surname = Surname}.
 
 -spec get_account(account_number()) -> {ok, #account{}} | {error, any()}.

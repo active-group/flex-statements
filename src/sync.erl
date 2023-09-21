@@ -69,10 +69,12 @@ handle_transfer_event(State,Message)->ok.
 % unter dem Atom transfers erwarten wir ein Event nach der Definition aus https://github.com/active-group/flex-transfers/blob/main/README.md
 % 
 process_message(State,#accountEvent{id=Id}=Message) ->
-    business_logic:make_account(Message),
+    Ret = business_logic:make_account(Message),
+    logger:info("Account created~p~n",[Ret]),
     State#state{accountLastEventId=Id};
 process_message(State,#transferEvent{eventId=Id}=Message) ->
-    business_logic:transfer(Message),
+    Ret = business_logic:transfer(Message),
+    logger:info("Transfer created~p~n",[Ret]),
     State#state{transferLastEventId=Id};
 process_message(State,Message)->
     logger:info("Unknown Event ~p~n",[Message]),

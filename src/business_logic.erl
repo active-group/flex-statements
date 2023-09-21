@@ -37,39 +37,14 @@ transfer(#transferEvent{ accountIdSender = SenderAccountNumber,
   accountIdReceiver = ReceiverAccountNumber,
   amount = Amount,
   timestamp = Timestamp}) ->
-    TransferFunction =
-      fun() -> 
-        MaybeAccountSender = database:get_account(SenderAccountNumber),
-        MaybeAccountReceiver = database:get_account(ReceiverAccountNumber),
-        case {MaybeAccountSender, MaybeAccountReceiver} of
-            {{error, not_found}, _} -> {error, sender_account_not_found};
-            {_, {error, not_found}} -> {error, receiver_account_not_found};
-
-            {{ok, AccountSender}, {ok, AccountReceiver}} ->
-                AccountSenderAmount = AccountSender#account.amount,
-                AccountReceiverAmount = AccountReceiver#account.amount,
-
-                if
-                    AccountSenderAmount - Amount >= 0 ->
-                        TransferId = database:unique_transfer_id(),
-                        Transfer = #transfer{id = TransferId,
-                                            timestamp = Timestamp,
-                                            from_account_number = SenderAccountNumber,
-                                            to_account_number = ReceiverAccountNumber,
-                                            amount = Amount},
-                        NewAccountSender = AccountSender#account{amount = (AccountSenderAmount - Amount)},
-                        NewAccountReceiver = AccountReceiver#account{amount = (AccountReceiverAmount + Amount)},
-                        database:put_transfer(Transfer),
-                        database:put_account(NewAccountSender),
-                        database:put_account(NewAccountReceiver),
-                        {ok, TransferId};
-                    true ->
-                        {error, insufficient_funds}
-                end
-        end
-      end,
-
-    database:atomically(TransferFunction).
+    TransferId = database:unique_transfer_id(),
+    Transfer = #transfer{id = TransferId,
+                        timestamp = Timestamp,
+                        from_account_number = SenderAccountNumber,
+                        to_account_number = ReceiverAccountNumber,
+                        amount = Amount},
+    database:put_transfer(Transfer),
+    {ok, TransferId}.
 
 %% Takes a list of transfers and returns them sorted by their id (asc)
 
