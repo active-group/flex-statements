@@ -10,7 +10,7 @@
     transfersServiceName :: string()
 }).
 
-interval_milliseconds()-> 30000.
+interval_milliseconds()-> 10000.
 initTrigger()->
   timer:send_interval(interval_milliseconds(), interval),
   {ok}.

@@ -65,7 +65,8 @@ index() ->
 %% given by account.
 -spec name_by_account(#account{}) -> string().
 name_by_account(Account) ->
-    io_lib:format("~s ~s", [Account#account.given_name, Account#account.surname]).
+    logger:info("name_by_account ~p",[Account]),
+    io_lib:format("~p ~p", [Account#account.given_name, Account#account.surname]).
 
 head_template() ->
 "<p> Name: ~s </p>
@@ -135,8 +136,11 @@ statement(Account, Transfers, Currency, Format) ->
 %% given by account number.
 -spec name_by_account_number(account_number()) -> string().
 name_by_account_number(AccountNumber) ->
-    {ok, Account} = business_logic:get_account(AccountNumber),
-    binary_to_list(Account#account.given_name) ++ " " ++ binary_to_list(Account#account.surname).
+    Ret = business_logic:get_account(AccountNumber),
+    case Ret of
+      {ok, Account} -> io_lib:format("~s ~s",[Account#account.given_name,Account#account.surname]);
+      _ -> ""
+    end.
 
 
 %% /statements/request
