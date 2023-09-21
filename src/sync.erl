@@ -1,7 +1,7 @@
 -module(sync).
 -include("data.hrl").
 -behavior(gen_server).
--export([start/3,handle_call/3,handle_cast/2,init/1]).
+-export([start/3,handle_call/3,handle_cast/2,init/1,handle_info/2]).
 
 -record(state,{
     accountLastEventId :: integer(),
