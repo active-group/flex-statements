@@ -17,7 +17,6 @@
 % ####### Events
 % 
 
-
 -record(accountEvent,
     {id :: unique_id(),
      eventType :: account_created,
@@ -32,3 +31,10 @@
     accountIdSender :: integer(),
     accountIdReceiver :: integer(),
     timestamp :: erlang:timestamp()}).
+
+-record(getLastType,{
+    since :: non_neg_integer(),
+    receiver_pid :: pid()
+}).
+
+-type event() :: #accountEvent{} | #transferEvent{}.
