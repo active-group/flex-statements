@@ -26,10 +26,10 @@
     
 -record(transfer_event,{
     source :: transfer_service,
-    eventId :: integer(),
+    eventId :: non_neg_integer(),
+    accountIdSender :: non_neg_integer(),
+    accountIdReceiver :: non_neg_integer(),
     amount :: number(),
-    accountIdSender :: integer(),
-    accountIdReceiver :: integer(),
     timestamp :: erlang:timestamp()}).
 
 -record(get_account_events_since,{
