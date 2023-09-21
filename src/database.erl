@@ -99,3 +99,6 @@ unique_transfer_id() -> dets:update_counter(table_id, transfer, 1).
 -spec atomically(fun(() -> Ret)) -> Ret.
 atomically(Function) ->
     Function().
+
+
+stub_get_account(Id,Input) -> Input.

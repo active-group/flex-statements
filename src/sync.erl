@@ -41,11 +41,15 @@ registerForEvents(#state{
 -spec init(string()) -> {ok, #state{}}.
 init(State) ->
     initTrigger(),
+    logger:info("Started own-service ~p~n",[self()]),
     {ok, State}.
 
 -spec start(string(),string(),string()) -> {ok,pid()}.
 start(OwnServiceName, AccountsServiceName, TransfersServiceName) ->
-    gen_server:start(ownServiceName,
+    logger:info("Starting own-service ~n"),
+    gen_server:start(
+                    [local, OwnServiceName],
+                    sync,
                     #state{
                         accountLastEventId = 0, 
                         transferLastEventId = 0,

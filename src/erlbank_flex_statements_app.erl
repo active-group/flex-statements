@@ -20,6 +20,9 @@ start(_StartType, _StartArgs) ->
     start_cowboy(),
     database:init_database(),
 
+
+    sync:start(wir,accounts,transfers),
+
     Res = erlbank_flex_statements_sup:start_link(),
     logger:info("Started account feed: ~p~n", [node()]),
     Res.
