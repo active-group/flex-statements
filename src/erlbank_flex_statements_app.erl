@@ -20,6 +20,8 @@ start(_StartType, _StartArgs) ->
     start_cowboy(),
     database:init_database(),
 
+    AccountNode = node_util:node_from_env(accounts, "ACCOUNTS_HOST"),
+    TransferNode = node_util:node_from_env(transfers, "TRANSFERS_HOST"),
 
     sync:start(wir,accounts,transfers),
 
