@@ -25,8 +25,6 @@ prologue() ->
         "      </a>"
         "    </div>"
         "    <div class=\"navbar-start\">"
-        "      <a class=\"navbar-item\" href=\"#open-account\">Open Account</a>"
-        "      <a class=\"navbar-item\" href=\"#create-transfer\">Create Transfer</a>"
         "      <a class=\"navbar-item\" href=\"#request-statement\">Request Statement</a>"
         "    </div>"
         "  </nav>"
