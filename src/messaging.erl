@@ -29,7 +29,8 @@
 
 -spec handle_call(mutation_message(), pid(), receive_server_state()) ->
     {reply, {ok, account_number_dto()}, receive_server_state()}
-    | {reply, {ok, transaction_number_dto()}, receive_server_state()}.
+    | {reply, {ok, transaction_number_dto()}, receive_server_state()}
+    | {reply, {error, term()}}.
 handle_call(
     #account_created{
         account_number = AccountNr,
@@ -41,6 +42,7 @@ handle_call(
     State
 ) ->
     todo;
+% transfer(account_number(), account_number(), money())
 handle_call(
     #transaction_succeeded{
         transaction_id = TransactionId,
@@ -49,7 +51,10 @@ handle_call(
         amount = Amount,
         timestamp = Timestamp
     },
-    From,
+    _From,
     State
 ) ->
-    todo.
+    case business_logic:transfer(FromAccountNr, ToAccountNr, Amount) of
+        {ok, Tid} -> {reply, {ok, Tid}, State};
+        {error, Cause} -> {reply, {error, Cause}}
+    end.
