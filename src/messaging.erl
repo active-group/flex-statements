@@ -4,7 +4,7 @@
 
 -include("data.hrl").
 
--export([handle_call/3, init/1, handle_cast/2]).
+-export([handle_call/3, init/1, handle_cast/2, receive_server_start/0, receive_server_start_link/0]).
 
 -type receive_server_state() :: list().
 -type account_number_dto() :: number().
@@ -71,3 +71,9 @@ handle_call(
     {noreply, receive_server_state()}.
 handle_cast(_, State) ->
     {noreply, State}.
+
+receive_server_start() ->
+    gen_server:start(?MODULE, [], [{debug, [trace]}]).
+
+receive_server_start_link() ->
+    gen_server:start(?MODULE, [], [{debug, [trace]}]).
