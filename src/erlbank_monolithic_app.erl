@@ -18,6 +18,9 @@ start_cowboy() ->
         ]}
     ]),
 
+    {ok,Pid} = messaging:receive_server_start(),
+    io:format("-----> Messaging Pid: ~w~n",[Pid]),
+
     {ok, _} = cowboy:start_clear(
         my_http_listener,
         [{port, 8002}],
