@@ -43,10 +43,13 @@ handle_call(
     },
     _From,
     []
-) -> business_logic:open_account(GivenName, Surname, AccountNr, Amount),
+) ->
+    business_logic:open_account(GivenName, Surname, AccountNr, Amount),
     {reply,
-        {ok, AccountNr}, % Antwort
-        []}; % neuer Zustand
+        % Antwort
+        {ok, AccountNr},
+        % neuer Zustand
+        []};
 % transfer(account_number(), account_number(), money())
 handle_call(
     #transaction_succeeded{
@@ -59,8 +62,8 @@ handle_call(
     _From,
     State
 ) ->
-    case business_logic:transfer(FromAccountNr, ToAccountNr, Amount) of
-        {ok, Tid} -> {reply, {ok, Tid}, State};
+    case business_logic:transfer(FromAccountNr, ToAccountNr, Amount, Timestamp) of
+        {ok, _Tid} -> {reply, {ok, TransactionId}, State};
         {error, Cause} -> {reply, {error, Cause}}
     end.
 
