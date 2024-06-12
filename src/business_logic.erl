@@ -19,7 +19,7 @@ open_account(GivenName, Surname, AccountNr, Amount) ->
 -spec get_account(account_number()) -> {ok, #account{}} | {error, any()}.
 get_account(AccountNumber) -> database:get_account(AccountNumber).
 
--spec make_person(binary(), binary(), binary()) -> #person{}.
+-spec make_person(binary(), binary(), number()) -> #person{}.
 make_person(GivenName, Surname, AccountNr) ->
     Person = #person{
         id = AccountNr,
