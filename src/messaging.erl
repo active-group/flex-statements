@@ -62,7 +62,7 @@ handle_call(
     _From,
     State
 ) ->
-    case business_logic:transfer(FromAccountNr, ToAccountNr, Amount, Timestamp) of
+    case business_logic:transfer(TransactionId, FromAccountNr, ToAccountNr, Amount, Timestamp) of
         {ok, _Tid} -> {reply, {ok, TransactionId}, State};
         {error, Cause} -> {reply, {error, Cause}}
     end.

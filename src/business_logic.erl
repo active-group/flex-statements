@@ -2,7 +2,7 @@
 
 -module(business_logic).
 -include("data.hrl").
--export([open_account/4, get_account/1, get_person/1, transfer/4, sort_transfers/1, get_transfers/1]).
+-export([open_account/4, get_account/1, get_person/1, transfer/5, sort_transfers/1, get_transfers/1]).
 
 %% Opens an account, that is creates a new account containing a new person
 %% Writes them into database.
@@ -13,7 +13,8 @@ open_account(GivenName, Surname, AccountNr, Amount) ->
         make_person(
             GivenName, Surname, AccountNr
         ),
-        Amount, AccountNr
+        Amount,
+        AccountNr
     ).
 
 -spec get_account(account_number()) -> {ok, #account{}} | {error, any()}.
@@ -53,10 +54,10 @@ get_transfers(Id) ->
 %% Returns {ok, tid}, where tid is the id of the stored transfer
 %% or {error, insufficient_funds} when there is not enough money in the sender account.
 
--spec transfer(account_number(), account_number(), money(), erlang:timestamp()) -> 
+-spec transfer(unique_id(), account_number(), account_number(), money(), erlang:timestamp()) -> 
      {error, sender_account_not_found | receiver_account_not_found | insufficient_funds}
    | {ok, unique_id()}.
-transfer(SenderAccountNumber, ReceiverAccountNumber, Amount, Timestamp) ->
+transfer(TransferId, SenderAccountNumber, ReceiverAccountNumber, Amount, Timestamp) ->
     TransferFunction =
         fun() ->
             MaybeAccountSender = database:get_account(SenderAccountNumber),
@@ -72,7 +73,6 @@ transfer(SenderAccountNumber, ReceiverAccountNumber, Amount, Timestamp) ->
 
                     if
                         AccountSenderAmount - Amount >= 0 ->
-                            TransferId = database:unique_transfer_id(),
                             Transfer = #transfer{
                                 id = TransferId,
                                 timestamp = Timestamp,

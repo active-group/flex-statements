@@ -29,7 +29,8 @@ open_account(GivenName, Surname, AccountNr, Amount) ->
 %% to stdout.
 -spec transfer(account_number(), account_number(), money()) -> ok.
 transfer(SenderAccountNumber, ReceiverAccountNumber, Amount) ->
-    case business_logic:transfer(SenderAccountNumber, ReceiverAccountNumber, Amount, erlang:timestamp()) of
+    TransferId = database:unique_transfer_id(),
+    case business_logic:transfer(TransferId, SenderAccountNumber, ReceiverAccountNumber, Amount, erlang:timestamp()) of
         {ok, TransferId} ->
             io:format("Transfer successful, id: ~p~n", [TransferId]);
         {error, Error} ->
