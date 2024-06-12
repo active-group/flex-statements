@@ -25,7 +25,7 @@ prologue() ->
         "      </a>"
         "    </div>"
         "    <div class=\"navbar-start\">"
-        "      <a class=\"navbar-item\" href=\"#request-statement\">Request Statement</a>"
+        "      <a class=\"navbar-item\" href=\"/\">Request Statement</a>"
         "    </div>"
         "  </nav>"
         "    "
@@ -129,14 +129,16 @@ transfer(Transfer, Currency, Format) ->
 head_template() ->
     "<p> Name: ~s </p>\n"
     "     <p> Balance: ~s </p>\n"
-    "     <table>\n"
-    "      <tr>\n"
-    "        <th>ID</th>\n"
-    "        <th>Date</th>\n"
-    "        <th>Amount</th>\n"
-    "        <th>Sender</th>\n"
-    "        <th>Receiver</th>\n"
-    "      </tr> ".
+    "     <table class=\"table\">\n"
+    "       <tbody>"
+    "         <tr>\n"
+    "           <th>ID</th>\n"
+    "           <th>Date</th>\n"
+    "           <th>Amount</th>\n"
+    "           <th>Sender</th>\n"
+    "           <th>Receiver</th>\n"
+    "         </tr> "
+    "       </tbody>".
 
 back_button() ->
     "<a href=\"/\">Back </a>".
@@ -156,7 +158,12 @@ statement(Account, Transfers, Currency, Format) ->
     TransfersString = lists:foldl(
         fun(Transfer, Acc) -> Acc ++ transfer(Transfer, Currency, Format) end, "", Transfers
     ),
-    io_lib:format("~s ~s ~s", [head(Account, Currency, Format), TransfersString, footer_template()]).
+    io_lib:format("~s ~s ~s ~s", [
+        prologue(),
+        head(Account, Currency, Format),
+        TransfersString,
+        footer_template()
+    ]).
 
 index() ->
     io_lib:format(
