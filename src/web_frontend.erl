@@ -10,6 +10,7 @@ prologue() ->
         "<head>"
         "  <title>erlbank - more functional than perlbank!</title>"
         "  <link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css\">"
+        "  <link rel=\"stylesheet\" href=\"https://bulma.io/vendor/fontawesome-free-6.5.2-web/css/all.min.css\">"
         "</head>"
         "<body>"
         "  <nav class=\"navbar\" role=\"navigation\" aria-label=\"main navigation\">"
@@ -45,7 +46,7 @@ bin_to_int(B) ->
 
 statement_form() ->
     <<
-        "<nav class=\"panel is-link\" style=\"margin: 1rem; margin-bottom: 20rem;\">"
+        "<nav class=\"panel is-link\" style=\"margin: 1rem;\">"
         "  <p class=\"panel-heading\" id=\"request-statement\">Request statement</p>\n"
         "  <div class\"panel-block\" style=\"margin: 0.75rem 1rem;\">"
         "    <form id=\"statement_form\" method=\"post\" action=\"/statements/request\">\n"
@@ -77,7 +78,12 @@ statement_form() ->
         "  <div class=\"panel-block\">"
         "    <div class=\"field is-grouped\">"
         "      <div class=\"control\">"
-        "        <button form=\"statement_form\" class=\"button is-link\" type=\"submit\">Request statement</button>\n"
+        "        <button form=\"statement_form\" class=\"button is-link\" type=\"submit\">"
+        "          <span class=\"icon is-small\">"
+        "            <i class=\"fas fa-check\"></i>"
+        "          </span>"
+        "          <span>Request statement</span>"
+        "        </button>"
         "      </div>"
         "      <div class=\"control\">"
         "        <button form=\"statement_form\" class=\"button is-danger\" type=\"reset\">Reset</button>\n"
@@ -127,24 +133,37 @@ transfer(Transfer, Currency, Format) ->
     io_lib:format(transfer_template(), [Id, Date, Amount, Name1, Name2]).
 
 head_template() ->
-    "<p> Name: ~s </p>\n"
-    "     <p> Balance: ~s </p>\n"
-    "     <table class=\"table\">\n"
-    "       <tbody>"
-    "         <tr>\n"
-    "           <th>ID</th>\n"
-    "           <th>Date</th>\n"
-    "           <th>Amount</th>\n"
-    "           <th>Sender</th>\n"
-    "           <th>Receiver</th>\n"
-    "         </tr> "
-    "       </tbody>".
+    "<nav class=\"panel is-link\" style=\"margin: 1rem;\">"
+    "  <p class=\"panel-heading\">~s</p>"
+    "  <div class=\"panel-block\">"
+    "    <span class=\"icon-text\"><span class=\"icon\"><i class=\"fas fa-scale-balanced\"></i></span><span> Balance: ~s </span></span>\n"
+    "  </div>"
+    "  <div class=\"panel-block\">"
+    "    <table class=\"table is-full-width\" style=\"width: 100%;\">\n"
+    "      <thead>"
+    "        <tr>\n"
+    "          <th>ID</th>\n"
+    "          <th>Date</th>\n"
+    "          <th>Amount</th>\n"
+    "          <th>Sender</th>\n"
+    "          <th>Receiver</th>\n"
+    "        </tr> "
+    "      </thead>"
+    "      <tbody>".
 
 back_button() ->
-    "<a href=\"/\">Back </a>".
+    "<a class=\"button\" style=\"margin-left: 1rem;\" href=\"/\">"
+    "  <span class=\"icon is-small\">"
+    "    <i class=\"fas fa-arrow-left\"></i>"
+    "  </span>"
+    "  <span>Back</span>"
+    "</a>".
 
 footer_template() ->
-    "</table>" ++ back_button().
+    "      </tbody>"
+    "    </table>"
+    "  </div>"
+    "</nav>" ++ back_button().
 
 -spec head(#account{}, string(), number_formatter:locale()) -> string().
 head(Account, Currency, Format) ->
