@@ -41,109 +41,9 @@ epilogue() ->
         "    "
     >>.
 
-account_opened_success() ->
-    <<
-        "\n"
-        "      <p> Account with account number ~p was opened successfully </p> ~n\n"
-        "       <a href=\"/\"> Back </a>\n"
-        "    "
-    >>.
-
-account_open_form() ->
-    <<
-        "\n"
-        "<nav class=\"panel is-primary\" style=\"margin: 1rem\">"
-        "  <p class=\"panel-heading\" id=\"open-account\">Open Account</p>\n"
-        "  <div class\"panel-block\" style=\"margin: 0.75rem 1rem;\">"
-        "    <form id=\"account_open_form\" method=\"post\" action=\"/accounts/open\">\n"
-        "      <div class=\"field\">"
-        "        <label class=\"label\" for=\"accounts_givenName\">Given Name</label>\n"
-        "        <div class=\"control\">"
-        "          <input class=\"input\" type=\"text\" id=\"accounts_givenName\" name=\"accounts_givenName\" placeholder=\"Given-Name\" />\n"
-        "        </div>"
-        "      </div>"
-        "      <div class=\"field\">"
-        "        <label class=\"label\" for=\"accounts_surname\">Surname</label>\n"
-        "        <div class=\"control\">"
-        "          <input class=\"input\" type=\"text\" id=\"accounts_surname\" name=\"accounts_surname\" placeholder=\"Surname\" />\n"
-        "        </div>"
-        "      </div>"
-        "    </form>"
-        "  </div>"
-        "  <div class=\"panel-block\">"
-        "    <div class=\"field is-grouped\">"
-        "      <div class=\"control\">"
-        "        <button form=\"account_open_form\" class=\"button is-primary\" type=\"submit\">Open Account</button>\n"
-        "      </div>"
-        "      <div class=\"control\">"
-        "        <button form=\"account_open_form\" class=\"button is-danger\" type=\"reset\">Reset</button>\n"
-        "      </div>"
-        "    </div>"
-        "  </div>"
-        "</nav>"
-    >>.
-
 -spec bin_to_int(binary()) -> integer().
 bin_to_int(B) ->
     erlang:list_to_integer(binary:bin_to_list(B)).
-
--spec transfer_error() -> binary().
-transfer_error() ->
-    <<
-        "\n"
-        "      <p> An error occured: ~p </p> ~n\n"
-        "       <a href=\"/\"> Back </a>\n"
-        "    "
-    >>.
-
--spec transfer_success() -> binary().
-transfer_success() ->
-    <<
-        "\n"
-        "      <p> Transfer with id ~p successfully created </p> ~n\n"
-        "               <a href=\"/\"> Back </a>\n"
-        "    "
-    >>.
-
-transfer_form() ->
-    <<
-        "\n"
-        "<nav class=\"panel is-info\" style=\"margin: 1rem\">"
-        "  <p class=\"panel-heading\" id=\"create-transfer\">Create transfer</p>\n"
-        "  <div class\"panel-block\" style=\"margin: 0.75rem 1rem;\">"
-        "    <form id=\"transfers\" method=\"post\" action=\"/transfers/create\">\n"
-        "      <div class=\"field\">"
-        "        <label class=\"label\" for=\"transfers_from\">From (account number)</label>\n"
-        "        <div class=\"control\">"
-        "          <input class=\"input\" type=\"text\" id=\"transfers_from\" name=\"transfers_from\" placeholder=\"From Account Number\" />\n"
-        "        </div>"
-        "      </div>"
-        "      <div class=\"field\">"
-        "        <label class=\"label\" for=\"transfers_to\"> To (account number) </label>\n"
-        "        <div class=\"control\">"
-        "          <input class=\"input\" type=\"text\" id=\"transfers_to\" name=\"transfers_to\" placeholder=\"To Account Number\" />\n"
-        "        </div>"
-        "      </div>"
-        "      <div class=\"field\">"
-        "        <label class=\"label\" for=\"transfers_amount\"> Amount </label>\n"
-        "        <div class=\"control\">"
-        "          <input class=\"input\" type=\"text\" id=\"transfers_amount\" name=\"transfers_amount\" placeholder=\"Amount\" />\n"
-        "        </div>"
-        "      </div>"
-        "    </form>"
-        "  </div>"
-        "  <div class=\"panel-block\">"
-        "    <div class=\"field is-grouped\">"
-        "      <div class=\"control\">"
-        "        <button form=\"transfers\" class=\"button is-info\" type=\"submit\">Create transfer</button>\n"
-        "      </div>"
-        "      <div class=\"control\">"
-        "        <button form=\"transfers\" class=\"button is-danger\" type=\"reset\">Reset</button>\n"
-        "      </div>"
-        "    </div>"
-        "  </div>"
-        "</nav>"
-    >>.
 
 statement_form() ->
     <<
@@ -262,11 +162,9 @@ statement(Account, Transfers, Currency, Format) ->
 
 index() ->
     io_lib:format(
-        "~s~s~s~s~s",
+        "~s~s~s",
         [
             prologue(),
-            account_open_form(),
-            transfer_form(),
             statement_form(),
             epilogue()
         ]
@@ -314,42 +212,6 @@ init(Request, request_statement) ->
             ),
             {ok, Reply, []}
     end;
-%% /transfers/create
-init(Request, create_transfer) ->
-    {ok, KeyValuesL, _} = cowboy_req:read_urlencoded_body(Request),
-
-    KeyValues = maps:from_list(KeyValuesL),
-    SenderAccountNumber = bin_to_int(maps:get(<<"transfers_from">>, KeyValues)),
-    ReceiverAccountNumber = bin_to_int(maps:get(<<"transfers_to">>, KeyValues)),
-    Amount = bin_to_int(maps:get(<<"transfers_amount">>, KeyValues)),
-
-    Body =
-        case business_logic:transfer(SenderAccountNumber, ReceiverAccountNumber, Amount) of
-            {ok, TransferId} ->
-                io_lib:format(transfer_success(), [TransferId]);
-            {error, Error} ->
-                io_lib:format(transfer_error(), [Error])
-        end,
-    Reply = cowboy_req:reply(200, #{<<"content-type">> => <<"text/html">>}, Body, Request),
-    {ok, Reply, []};
-%% /accounts/open
-init(Request, open_account) ->
-    logger:info("Creating new account"),
-
-    {ok, KeyValuesL, _} = cowboy_req:read_urlencoded_body(Request),
-
-    KeyValues = maps:from_list(KeyValuesL),
-    GivenName = maps:get(<<"accounts_givenName">>, KeyValues),
-    Surname = maps:get(<<"accounts_surname">>, KeyValues),
-
-    Account = business_logic:open_account(GivenName, Surname),
-    Body = io_lib:format(account_opened_success(), [Account#account.account_number]),
-
-    Reply = cowboy_req:reply(200, #{<<"content-type">> => <<"text/html">>}, Body, Request),
-
-    logger:info("Created account with account number ~p", [Account#account.account_number]),
-
-    {ok, Reply, []};
 %% /index
 init(Request, index) ->
     Reply = cowboy_req:reply(

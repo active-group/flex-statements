@@ -29,3 +29,4 @@ erlbank/*/*.dets
 xirbank/*/*.dets
 build
 .DS_Store
+*.dets
