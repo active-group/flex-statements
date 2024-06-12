@@ -4,7 +4,7 @@
 
 -include("data.hrl").
 
--export([]).
+-export([handle_call/3]).
 
 -type receive_server_state() :: list().
 -type account_number_dto() :: number().
@@ -38,10 +38,12 @@ handle_call(
         surname = Surname,
         amount = Amount
     },
-    From,
-    State
-) ->
-    todo;
+    _From,
+    []
+) -> business_logic:open_account(GivenName, Surname, AccountNr, Amount),
+    {reply,
+        {ok, AccountNr}, % Antwort
+        []}; % neuer Zustand
 % transfer(account_number(), account_number(), money())
 handle_call(
     #transaction_succeeded{
