@@ -13,7 +13,7 @@ open_account(GivenName, Surname, AccountNr, Amount) ->
         make_person(
             GivenName, Surname, AccountNr
         ),
-        Amount
+        Amount, AccountNr
     ).
 
 -spec get_account(account_number()) -> {ok, #account{}} | {error, any()}.
@@ -32,9 +32,9 @@ make_person(GivenName, Surname, AccountNr) ->
 -spec get_person(unique_id()) -> {ok, #person{} | {error, any()}}.
 get_person(Id) -> database:get_person(Id).
 
--spec make_account(#person{}, number()) -> #account{}.
-make_account(Person, Amount) ->
-    AccountNumber = database:unique_account_number(),
+-spec make_account(#person{}, number(), number()) -> #account{}.
+make_account(Person, Amount, AccountNr) ->
+    AccountNumber = AccountNr,
     Account = #account{
         account_number = AccountNumber,
         person_id = Person#person.id,

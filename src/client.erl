@@ -21,7 +21,7 @@ name_by_account_number(AccountNumber) ->
 open_account(GivenName, Surname, AccountNr, Amount) ->
     Account = business_logic:open_account(list_to_binary(GivenName),
                                           list_to_binary(Surname),AccountNr,Amount),
-    io:format("Account was successfully opened. Account number: ~p ~n", [Account#account.account_number]).
+    io:format("Account was successfully opened. Account number: ~p ~n", [AccountNr]).
 
 
 %% transfers a given amount from the first account to the second account, identified
