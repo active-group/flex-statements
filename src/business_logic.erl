@@ -7,7 +7,7 @@
 %% Opens an account, that is creates a new account containing a new person
 %% Writes them into database.
 
--spec open_account(binary(), binary(), binary(), binary()) -> #account{}.
+-spec open_account(binary(), binary(), account_number(), money()) -> #account{}.
 open_account(GivenName, Surname, AccountNr, Amount) ->
     make_account(
         make_person(

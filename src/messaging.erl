@@ -30,7 +30,7 @@ init(InitialN) ->
 
 -type mutation_message() :: #account_created{} | #transaction_succeeded{}.
 
--spec handle_call(mutation_message(), pid(), receive_server_state()) ->
+-spec handle_call(mutation_message(), gen_server:from(), receive_server_state()) ->
     {reply, {ok, account_number_dto()}, receive_server_state()}
     | {reply, {ok, transaction_number_dto()}, receive_server_state()}
     | {reply, {error, term()}}.
