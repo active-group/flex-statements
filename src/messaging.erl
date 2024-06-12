@@ -4,7 +4,7 @@
 
 -include("data.hrl").
 
--export([handle_call/3]).
+-export([handle_call/3, init/1, handle_cast/0]).
 
 -type receive_server_state() :: list().
 -type account_number_dto() :: number().
@@ -24,6 +24,9 @@
     amount :: number(),
     timestamp :: erlang:timestamp()
 }).
+
+init(InitialN) ->
+  {ok, InitialN}.
 
 -type mutation_message() :: #account_created{} | #transaction_succeeded{}.
 
@@ -60,3 +63,8 @@ handle_call(
         {ok, Tid} -> {reply, {ok, Tid}, State};
         {error, Cause} -> {reply, {error, Cause}}
     end.
+
+-spec handle_cast() ->
+  {noreply}.
+handle_cast() ->
+  {noreply}.
