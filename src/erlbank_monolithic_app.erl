@@ -20,7 +20,7 @@ start_cowboy() ->
 
     {ok, _} = cowboy:start_clear(
         my_http_listener,
-        [{port, 8000}],
+        [{port, 8002}],
         #{env => #{dispatch => Dispatch}}
     ).
 

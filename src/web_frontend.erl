@@ -58,7 +58,7 @@ statement_form() ->
         "      <div class=\"field\">"
         "        <label class=\"label\" for=\"statement_currency\"> Currency </label>\n"
         "        <div class=\"control\">"
-        "          <input class=\"input\" type=\"text\" id=\"statement_currency\" name=\"statement_currency\" value=\"EUR\" size=3 />\n"
+        "          <input class=\"input\" type=\"text\" id=\"statement_currency\" name=\"statement_currency\" value=\"EUR\" size=3 required />\n"
         "        </div>"
         "      </div>"
         "      <div class=\"field\">"
