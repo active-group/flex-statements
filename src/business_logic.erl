@@ -2,7 +2,7 @@
 
 -module(business_logic).
 -include("data.hrl").
--export([open_account/4, get_account/1, get_person/1, transfer/5, sort_transfers/1, get_transfers/1]).
+-export([open_account/4, get_account/1, get_person/1, transfer/5, sort_transfers/1, get_transfers/1, transfer_exists/1]).
 
 %% Opens an account, that is creates a new account containing a new person
 %% Writes them into database.
@@ -48,6 +48,13 @@ make_account(Person, Amount, AccountNr) ->
 get_transfers(Id) ->
     database:get_all_transfers(Id).
 
+-spec transfer_exists(unique_id()) -> boolean().
+transfer_exists(Tid) ->
+    case database:get_transfer(Tid) of
+        {ok, _} -> true;
+        {error, _} -> false
+    end.
+
 %% Takes a sender & receiver account number and an amount and transfers 
 %% that amount from sender to receiver.
 %% Crashes if accounts do not exist.
@@ -55,44 +62,42 @@ get_transfers(Id) ->
 %% or {error, insufficient_funds} when there is not enough money in the sender account.
 
 -spec transfer(unique_id(), account_number(), account_number(), money(), erlang:timestamp()) -> 
-     {error, sender_account_not_found | receiver_account_not_found | insufficient_funds}
+     {error, sender_account_not_found | receiver_account_not_found | insufficient_funds | tid_occupied}
    | {ok, unique_id()}.
 transfer(TransferId, SenderAccountNumber, ReceiverAccountNumber, Amount, Timestamp) ->
-    TransferFunction =
-        fun() ->
-            MaybeAccountSender = database:get_account(SenderAccountNumber),
-            MaybeAccountReceiver = database:get_account(ReceiverAccountNumber),
-            case {MaybeAccountSender, MaybeAccountReceiver} of
-                {{error, not_found}, _} ->
-                    {error, sender_account_not_found};
-                {_, {error, not_found}} ->
-                    {error, receiver_account_not_found};
-                {{ok, AccountSender}, {ok, AccountReceiver}} ->
-                    AccountSenderAmount = AccountSender#account.amount,
-                    AccountReceiverAmount = AccountReceiver#account.amount,
+    MaybeAccountSender = database:get_account(SenderAccountNumber),
+    MaybeAccountReceiver = database:get_account(ReceiverAccountNumber),
+    MaybeTransactionId = transfer_exists(TransferId),
+    case {MaybeAccountSender, MaybeAccountReceiver, MaybeTransactionId} of
+        {{error, not_found}, _, _} ->
+            {error, sender_account_not_found};
+        {_, {error, not_found}, _} ->
+            {error, receiver_account_not_found};
+        {_, _, true} ->
+            {error, tid_occupied};
+        {{ok, AccountSender}, {ok, AccountReceiver}, false} ->
+            AccountSenderAmount = AccountSender#account.amount,
+            AccountReceiverAmount = AccountReceiver#account.amount,
 
-                    if
-                        AccountSenderAmount - Amount >= 0 ->
-                            Transfer = #transfer{
-                                id = TransferId,
-                                timestamp = Timestamp,
-                                from_account_number = SenderAccountNumber,
-                                to_account_number = ReceiverAccountNumber,
-                                amount = Amount
-                            },
-                            NewAccountSender = AccountSender#account{amount = (AccountSenderAmount - Amount)},
-                            NewAccountReceiver = AccountReceiver#account{amount = (AccountReceiverAmount + Amount)},
-                            database:put_transfer(Transfer),
-                            database:put_account(NewAccountSender),
-                            database:put_account(NewAccountReceiver),
-                            {ok, TransferId};
-                        true ->
-                            {error, insufficient_funds}
-                    end
+            if
+                AccountSenderAmount - Amount >= 0 ->
+                    Transfer = #transfer{
+                        id = TransferId,
+                        timestamp = Timestamp,
+                        from_account_number = SenderAccountNumber,
+                        to_account_number = ReceiverAccountNumber,
+                        amount = Amount
+                    },
+                    NewAccountSender = AccountSender#account{amount = (AccountSenderAmount - Amount)},
+                    NewAccountReceiver = AccountReceiver#account{amount = (AccountReceiverAmount + Amount)},
+                    database:put_transfer(Transfer),
+                    database:put_account(NewAccountSender),
+                    database:put_account(NewAccountReceiver),
+                    {ok, TransferId};
+                true ->
+                    {error, insufficient_funds}
             end
-        end,
-
-    database:atomically(TransferFunction).
+    end.
 
 %% Takes a list of transfers and returns them sorted by their id (asc)
 
