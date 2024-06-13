@@ -92,9 +92,10 @@ notify_accounts_processed(AccountId) ->
 
 -spec notify_processed(atom(), string(), unique_id()) -> ok.
 notify_processed(Sender, EnvVar, MessageId) ->
-    ReplyAdr = node_util:node_from_env(Sender, EnvVar),
+    ReplyNode = node_util:node_from_env(Sender, EnvVar),
+    ReplyAdr = {Sender, ReplyNode},
     io:format("Sende Bestätigung an ~w~n", [ReplyAdr]),
-    gen_server:cast(ReplyAdr, {ok, <<"statements">>, MessageId}).
+    gen_server:cast(ReplyAdr, {ok, statements, MessageId}).
 
 -spec handle_call(term(), gen_server:from(), receive_server_state()) ->
     {noreply, receive_server_state()}.
