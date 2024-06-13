@@ -40,6 +40,12 @@ $ rebar3 compile
 
 The service can be run locally including a REPL using
 
+### Shell Befehle für Messaging
+- Create Account: gen_server:call(<0.263.0>, {account_created,1,"Peter","Lustig",2000}). 
+  -     gen_server_call(<PID>, {Function, AccountNr, Name, Surname, Amount})
+- Create Transaction: gen_server:call(<0.263.0>, {transaction_succeeded,1,1,2,1000,erlang:timestamp()}). 
+  -     gen_server_call(<PID>, {Function, TransactionID, Sender, Receiver, Amount, Timestamp})
+
 ```
 $ rebar3 shell
 ```
