@@ -19,7 +19,7 @@ start_cowboy() ->
     ]),
 
     {ok,Pid} = messaging:receive_server_start(),
-    register(statement_server, Pid),
+    register(statements, Pid),
     io:format("-----> Messaging Pid: ~w~n",[Pid]),
 
     {ok, _} = cowboy:start_clear(
