@@ -35,6 +35,7 @@ init(InitialN) ->
     | {reply, {ok, transaction_number_dto()}, receive_server_state()}
     | {reply, {error, term()}}.
 handle_call(
+    % gen_server:call(<0.263.0>, {account_created,3,"Peter","Lustig",2000}).
     #account_created{
         account_number = AccountNr,
         given_name = GivenName,
@@ -52,6 +53,7 @@ handle_call(
         []};
 % transfer(account_number(), account_number(), money())
 handle_call(
+    % gen_server:call(<0.263.0>, {transaction_succeeded,101,1,2,1000,erlang:timestamp()}).
     #transaction_succeeded{
         transaction_id = TransactionId,
         from_account_number = FromAccountNr,
@@ -64,7 +66,7 @@ handle_call(
 ) ->
     case business_logic:transfer(TransactionId, FromAccountNr, ToAccountNr, Amount, Timestamp) of
         {ok, _Tid} -> {reply, {ok, TransactionId}, State};
-        {error, Cause} -> {reply, {error, Cause}}
+        {error, Cause} -> {reply, {error, Cause}, State}
     end.
 
 -spec handle_cast(term(), receive_server_state()) ->
