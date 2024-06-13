@@ -75,11 +75,11 @@ handle_cast(
         {error, tid_occupied} ->
             io:format("Transaktionsnummer ~w leider bereits belegt~n", [TransactionId]),
             notify_transfers_processed(TransactionId),
-            {reply, State};
+            {noreply, State};
         {error, Cause} ->
             io:format("Leider ist der Fehler ~w passiert bei Verarbeitung von Transaktionsnummer ~w~n", [Cause, TransactionId]),
             notify_transfers_processed(TransactionId),
-            {reply, State}
+            {noreply, State}
     end.
 
 -spec notify_transfers_processed(unique_id()) -> ok.
