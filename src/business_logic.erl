@@ -12,13 +12,14 @@ open_account(GivenName, Surname, AccountNr, Amount) ->
     case get_account(AccountNr) of
         % OK, account does not yet exist
         {error, not_found} ->
-            make_account(
+            Account = make_account(
                 make_person(
                     GivenName, Surname, AccountNr
                 ),
                 Amount,
                 AccountNr
-            );
+            ),
+            {ok, Account};
         % Error, account already exists
         {ok, _} ->
             {error, account_exists}
