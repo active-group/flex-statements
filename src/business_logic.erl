@@ -6,18 +6,25 @@
 
 %% Opens an account, that is creates a new account containing a new person
 %% Writes them into database.
-
--spec open_account(binary(), binary(), account_number(), money()) -> #account{}.
+-type open_account_result() :: {ok, #account{}} | {error, account_exists}.
+-spec open_account(binary(), binary(), account_number(), money()) -> open_account_result().
 open_account(GivenName, Surname, AccountNr, Amount) ->
-    make_account(
-        make_person(
-            GivenName, Surname, AccountNr
-        ),
-        Amount,
-        AccountNr
-    ).
+    case get_account(AccountNr) of
+        % OK, account does not yet exist
+        {error, not_found} ->
+            make_account(
+                make_person(
+                    GivenName, Surname, AccountNr
+                ),
+                Amount,
+                AccountNr
+            );
+        % Error, account already exists
+        {ok, _} ->
+            {error, account_exists}
+    end.
 
--spec get_account(account_number()) -> {ok, #account{}} | {error, any()}.
+-spec get_account(account_number()) -> {ok, #account{}} | {error, not_found}.
 get_account(AccountNumber) -> database:get_account(AccountNumber).
 
 -spec make_person(binary(), binary(), number()) -> #person{}.

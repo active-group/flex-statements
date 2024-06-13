@@ -43,14 +43,18 @@ handle_call(
         amount = Amount
     },
     _From,
-    []
+    State
 ) ->
-    business_logic:open_account(GivenName, Surname, AccountNr, Amount),
-    {reply,
-        % Antwort
-        {ok, AccountNr},
-        % neuer Zustand
-        []};
+    case business_logic:open_account(GivenName, Surname, AccountNr, Amount) of
+        {ok, _Account} ->
+            {reply,
+                % Antwort
+                {ok, AccountNr},
+                % neuer Zustand (keine Änderung)
+                State};
+        {error, account_exists} ->
+            {reply, {error, {account_exists, AccountNr}}, State}
+    end;
 % transfer(account_number(), account_number(), money())
 handle_call(
     % gen_server:call(<0.263.0>, {transaction_succeeded,101,1,2,1000,erlang:timestamp()}).
