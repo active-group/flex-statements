@@ -10,12 +10,13 @@ These are our interfaces.
 
 Statements Service processes Account Creation Notifications (ACNs).
 
-| field name        | data type   | description                        |
-|-------------------|-------------|------------------------------------|
-| `account_number`  | `number()`  | Account number of Erlbank customer |
-| `given_name`      | `binary()`  | Given name of Erlbank customer     |
-| `surname`         | `binary()`  | Surname of Erlbank customer        |
-| `amount`          | `number()`  | Initial account balance            |
+| field name       | data type   | description                        |
+|------------------|-------------|------------------------------------|
+| `account_number` | `number()`  | Account number of Erlbank customer |
+| `given_name`     | `binary()`  | Given name of Erlbank customer     |
+| `surname`        | `binary()`  | Surname of Erlbank customer        |
+| `amount`         | `number()`  | Initial account balance            |
+| `person_id`      | `number()`  | Initial Person ID                  |
 
 ### Transaction Success Notification
 
@@ -42,7 +43,7 @@ The service can be run locally including a REPL using
 
 ### Shell Befehle für Messaging
 - Create Account: gen_server:cast(statements, {account_created,1,<<"Peter">>,<<"Lustig">>,2000,1}). 
-  -     gen_server:call(<PID>, {Function, AccountNr, Name, Surname, Amount})
+  -     gen_server:call(<PID>, {Function, AccountNr, Name, Surname, Amount, PersonID})
 - Create Transaction: gen_server:cast(statements, {transaction_succeeded,1,1,2,1000,erlang:timestamp()}). 
   -     gen_server:call(<PID>, {Function, TransactionID, Sender, Receiver, Amount, Timestamp})
 
