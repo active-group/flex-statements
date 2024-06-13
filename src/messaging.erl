@@ -84,16 +84,16 @@ handle_cast(
 
 -spec notify_transfers_processed(unique_id()) -> ok.
 notify_transfers_processed(TransactionId) ->
-    notify_processed(transfer_succeeded_ack, "TRANSFERS_HOST", TransactionId).
+    notify_processed(transfers, transfer_succeeded_ack, "TRANSFERS_HOST", TransactionId).
 
 -spec notify_accounts_processed(unique_id()) -> ok.
 notify_accounts_processed(AccountId) ->
-    notify_processed(accounts, "ACCOUNTS_HOST", AccountId).
+    notify_processed(accounts, accounts, "ACCOUNTS_HOST", AccountId).
 
--spec notify_processed(atom(), string(), unique_id()) -> ok.
-notify_processed(Sender, EnvVar, MessageId) ->
-    ReplyNode = node_util:node_from_env(Sender, EnvVar),
-    ReplyAdr = {Sender, ReplyNode},
+-spec notify_processed(atom(), atom(), string(), unique_id()) -> ok.
+notify_processed(NodeName, ProcName, EnvVar, MessageId) ->
+    ReplyNode = node_util:node_from_env(NodeName, EnvVar),
+    ReplyAdr = {ProcName, ReplyNode},
     io:format("Sende Bestätigung an ~w~n", [ReplyAdr]),
     gen_server:cast(ReplyAdr, {ok, statements, MessageId}).
 
