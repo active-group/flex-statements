@@ -91,6 +91,7 @@ transfer(Transfer, Currency, Format) ->
 
 head_template() ->
     "<p> Name: ~s </p>
+     <p> Account number: ~p </p>
      <p> Balance: ~s </p>
      <table>
       <tr>
@@ -111,8 +112,9 @@ footer_template() ->
 -spec head(#account{}, string(), number_formatter:locale()) -> string().
 head(Account, Currency, Format) ->
     Amount = amount_to_string(Account#account.amount, Currency, Format),
+    AccountNumber = Account#account.account_number,
     Name =  name_by_account(Account),
-    io_lib:format(head_template(), [Name, Amount]).
+    io_lib:format(head_template(), [Name, AccountNumber, Amount]).
 
 -spec statement(#account{}, list(#transfer{}), string(), number_formatter:locale()) -> string().
 statement(Account, Transfers, Currency, Format) ->
