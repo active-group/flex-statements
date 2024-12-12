@@ -35,11 +35,16 @@ handle_info(#update_subscription_timer{}, State) ->
             io:format("empty account list received~n"),
             {noreply, State};
         _ ->
-            io:format("update subscription timer gen_server:call result:~s~n", [Results]),
+            io:format("accounts received~n"),
             {ok, LastAccountNumber} = handle_account_dtos(Results, State#state.last_account_number),
     NewState = create_new_state(State, LastAccountNumber), 
     {noreply, NewState}
-    end.
+    end;
+
+handle_info(#account_dtos{account_dtos = AccountDtos}, State) ->
+    {ok, LastAccountNumber} = handle_account_dtos(AccountDtos, State#state.last_account_number),
+    NewState = create_new_state(State, LastAccountNumber), 
+    {noreply, NewState}.
 
 create_new_state(State, NewLastAccountNumber) ->
     #state{ last_account_number = NewLastAccountNumber, receiver_node = State#state.receiver_node, subscription_timer = State#state.subscription_timer }.
@@ -47,10 +52,8 @@ create_new_state(State, NewLastAccountNumber) ->
 handle_call(_Request, _From, State) ->
     {noreply, State}.
 
-handle_cast(#account_dtos{account_dtos = AccountDtos}, State) ->
-    {ok, LastAccountNumber} = handle_account_dtos(AccountDtos, State#state.last_account_number),
-    NewState = create_new_state(State, LastAccountNumber), 
-    {noreply, NewState}.
+handle_cast(_, State) ->
+    {noreply, State}.
 
 -spec handle_account_dtos(list(#account_dto{}), number()) -> {ok, number()}.
 handle_account_dtos([], LastAccountNumber) -> {ok, LastAccountNumber};
