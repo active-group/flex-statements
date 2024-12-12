@@ -33,4 +33,6 @@ stop(_State) ->
 
 % Startet die Komponente zur Abfrage der neu eröffneten Konten.
 start_accounts_consumer() ->
+    AccountNode = node_util:node_from_env(accounts, "ACCOUNTS_HOST"),
+    TransferNode = node_util:node_from_env(transfers, "TRANSFERS_HOST"),
     accounts_consumer:start().
