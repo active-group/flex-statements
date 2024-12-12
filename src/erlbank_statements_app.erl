@@ -18,7 +18,7 @@ start_cowboy() ->
                                              {"/statements/request", web_frontend, request_statement}]}]),
 
     {ok, _} = cowboy:start_clear(my_http_listener,
-                                 [{port, 8124}],
+                                 [{port, 8002}],
                                  #{env => #{dispatch => Dispatch}}).
 
 
