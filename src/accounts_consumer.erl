@@ -23,10 +23,14 @@ init(ReceiverNode) ->
     {ok, #state{ last_account_number = 0, receiver_node = ReceiverNode, subscription_timer = SubscriptionTimer }}.
 
 handle_info(#update_subscription_timer{}, State) ->
-    {reply, Result, _} = gen_server:call({account_server, State#state.receiver_node}, #subscribe_message{last_account_number = State#state.last_account_number}),
-    {ok, LastAccountNumber} = handle_account_dtos(Result#account_dtos.account_dtos, State#state.last_account_number),
-    NewState = create_new_state(State, LastAccountNumber), 
-    {noreply, NewState}.
+    try gen_server:call({account_server, State#state.receiver_node}, #subscribe_message{last_account_number = State#state.last_account_number}) of
+        {reply, Result, _} ->
+            {ok, LastAccountNumber} = handle_account_dtos(Result#account_dtos.account_dtos, State#state.last_account_number),
+            NewState = create_new_state(State, LastAccountNumber), 
+            {noreply, NewState}
+    catch _ ->
+        {noreply, State}
+    end.
 
 create_new_state(State, NewLastAccountNumber) ->
     #state{ last_account_number = NewLastAccountNumber, receiver_node = State#state.receiver_node, subscription_timer = State#state.subscription_timer }.

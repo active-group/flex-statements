@@ -15,13 +15,17 @@ start(ReceiverNode) ->
 
 init(ReceiverNode) ->
     {ok, GetTransfersFromTimer} = timer:send_interval(10000, #get_transfers_from_timer{}),
-    {ok, #state{ receiver_node = ReceiverNode, get_transfers_from_timer = GetTransfersFromTimer }}.
+    {ok, #state{ last_transfer_number = 0, receiver_node = ReceiverNode, get_transfers_from_timer = GetTransfersFromTimer }}.
 
 handle_info(#get_transfers_from_timer{}, State) ->
-    {reply, Results, _} = gen_server:call({transfers_server, State#state.receiver_node}, #get_transfers_from_message{start_transfer = State#state.start_transfer}),
-    {ok, LastTransferNumber} = handle_transfers(Results, State#state.last_transfer_number),
-    NewState = create_new_state(State, LastTransferNumber), 
-    {noreply, NewState}.
+    try gen_server:call({transfers_server, State#state.receiver_node}, #get_transfers_from_message{start_transfer = State#state.last_transfer_number}) of
+        {reply, Results, _} ->
+            {ok, LastTransferNumber} = handle_transfers(Results, State#state.last_transfer_number),
+            NewState = create_new_state(State, LastTransferNumber), 
+            {noreply, NewState}
+    catch _ ->
+        {noreply, State}
+    end.
 
 create_new_state(State, NewLastTransferNumber) ->
     #state{ last_transfer_number = NewLastTransferNumber, receiver_node = State#state.receiver_node, get_transfers_from_timer = State#state.get_transfers_from_timer }.
