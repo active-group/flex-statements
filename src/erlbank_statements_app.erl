@@ -25,8 +25,12 @@ start_cowboy() ->
 start(_StartType, _StartArgs) ->
     database:init_database(),
     start_cowboy(),
+    start_accounts_consumer(),
     erlbank_statements_sup:start_link().
 
 stop(_State) ->
     ok.
 
+% Startet die Komponente zur Abfrage der neu eröffneten Konten.
+start_accounts_consumer() ->
+    accounts_consumer:start().
