@@ -7,7 +7,7 @@
 
 -record(state, {last_transfer_number :: number(), receiver_node :: term(), get_transfers_from_timer :: timer:tref()}).
 -record(get_transfers_from_timer, {}).
--record(get_transfers_from_message,{start_transfer :: number()}).
+-record(get_all_transfers_from,{start_transfer :: number()}).
 
 % Verbindet sich mit dem Modul account_server des Prozesses mit dem short name "accounts".
 start(ReceiverNode) ->
@@ -18,8 +18,8 @@ init(ReceiverNode) ->
     {ok, #state{ last_transfer_number = 0, receiver_node = ReceiverNode, get_transfers_from_timer = GetTransfersFromTimer }}.
 
 handle_info(#get_transfers_from_timer{}, State) ->
-    try gen_server:call({transfers_server, State#state.receiver_node}, #get_transfers_from_message{start_transfer = State#state.last_transfer_number}) of
-        {reply, Results, _} ->
+    try gen_server:call({transfers_server, State#state.receiver_node}, #get_all_transfers_from{start_transfer = State#state.last_transfer_number}) of
+        Results ->
             {ok, LastTransferNumber} = handle_transfers(Results, State#state.last_transfer_number),
             NewState = create_new_state(State, LastTransferNumber), 
             {noreply, NewState}
