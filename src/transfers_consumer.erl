@@ -24,6 +24,7 @@ handle_info(#get_transfers_from_timer{}, State) ->
             NewState = create_new_state(State, LastTransferNumber), 
             {noreply, NewState}
     catch _:_ ->
+        logger:info("Call to transfers_server failed!"),
         {noreply, State}
     end.
 

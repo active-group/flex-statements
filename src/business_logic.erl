@@ -38,7 +38,7 @@ insert_account(AccountNumber, PersonId, StartAmount) ->
 
 % -spec insert_transfer(unique_id(), erlang:timestamp(), account_number(), account_number(), money()) -> #transfer{}.
 insert_transfer(TransferId, Timestamp, SenderAccountNumber, ReceiverAccountNumber, Amount) ->
-
+    logger:info("Transfer ~p received", [TransferId]),
     TransferFunction =
       fun() -> 
         MaybeAccountSender = database:get_account(SenderAccountNumber),

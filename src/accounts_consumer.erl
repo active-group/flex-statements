@@ -19,7 +19,7 @@ start(ReceiverNode) ->
     gen_server:start(?MODULE, ReceiverNode, [{debug, [trace]}]).
 
 init(ReceiverNode) ->
-    {ok, SubscriptionTimer} = timer:send_interval(5000, #update_subscription_timer{}),
+    {ok, SubscriptionTimer} = timer:send_interval(30000, #update_subscription_timer{}),
     {ok, #state{ last_account_number = 0, receiver_node = ReceiverNode, subscription_timer = SubscriptionTimer }}.
 
 handle_info(#update_subscription_timer{}, State) ->
@@ -29,6 +29,7 @@ handle_info(#update_subscription_timer{}, State) ->
             NewState = create_new_state(State, LastAccountNumber), 
             {noreply, NewState}
     catch _:_ ->
+        logger:info("Call to accounts_server failed!"),
         {noreply, State}
     end.
 
