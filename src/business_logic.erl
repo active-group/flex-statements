@@ -3,7 +3,7 @@
 -module(business_logic).
 -include("data.hrl").
 -export([open_account/2, get_account/1, get_person/1, transfer/3, sort_transfers/1, get_transfers/1,
-         insert_account/5 ]).
+         insert_account/5, insert_transfer/5 ]).
 
 
 %% Opens an account, that is creates a new account containing a new person 
@@ -35,6 +35,37 @@ insert_account(AccountNumber, PersonId, StartAmount) ->
                    amount = StartAmount},
     database:put_account(Account),
     Account.
+
+% -spec insert_transfer(unique_id(), erlang:timestamp(), account_number(), account_number(), money()) -> #transfer{}.
+insert_transfer(TransferId, Timestamp, SenderAccountNumber, ReceiverAccountNumber, Amount) ->
+
+    TransferFunction =
+      fun() -> 
+        MaybeAccountSender = database:get_account(SenderAccountNumber),
+        MaybeAccountReceiver = database:get_account(ReceiverAccountNumber),
+        case {MaybeAccountSender, MaybeAccountReceiver} of
+            {{error, not_found}, _} -> {error, sender_account_not_found};
+            {_, {error, not_found}} -> {error, receiver_account_not_found};
+
+            {{ok, AccountSender}, {ok, AccountReceiver}} ->
+                AccountSenderAmount = AccountSender#account.amount,
+                AccountReceiverAmount = AccountReceiver#account.amount,
+
+                Transfer = #transfer{id = TransferId,
+                                    timestamp = Timestamp,
+                                    from_account_number = SenderAccountNumber,
+                                    to_account_number = ReceiverAccountNumber,
+                                    amount = Amount},
+                NewAccountSender = AccountSender#account{amount = (AccountSenderAmount - Amount)},
+                NewAccountReceiver = AccountReceiver#account{amount = (AccountReceiverAmount + Amount)},
+                database:put_transfer(Transfer),
+                database:put_account(NewAccountSender),
+                database:put_account(NewAccountReceiver),
+                {ok, TransferId}
+        end
+      end,
+
+    database:atomically(TransferFunction).
 
 -spec get_account(account_number()) -> {ok, #account{}} | {error, any()}.
 get_account(AccountNumber) -> database:get_account(AccountNumber).
