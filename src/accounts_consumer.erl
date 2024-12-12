@@ -28,7 +28,7 @@ handle_info(#update_subscription_timer{}, State) ->
             {ok, LastAccountNumber} = handle_account_dtos(Result#account_dtos.account_dtos, State#state.last_account_number),
             NewState = create_new_state(State, LastAccountNumber), 
             {noreply, NewState}
-    catch _ ->
+    catch _:_ ->
         {noreply, State}
     end.
 

@@ -23,7 +23,7 @@ handle_info(#get_transfers_from_timer{}, State) ->
             {ok, LastTransferNumber} = handle_transfers(Results, State#state.last_transfer_number),
             NewState = create_new_state(State, LastTransferNumber), 
             {noreply, NewState}
-    catch _ ->
+    catch _:_ ->
         {noreply, State}
     end.
 
