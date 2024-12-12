@@ -6,7 +6,7 @@
 
 -record(state, {last_account_number :: number, receiver_node :: term(), subscription_timer :: timer:tref()}).
 -record(update_subscription_timer, {}).
--record(subscribe_message, {last_account_number :: number()}).
+-record(subscribe, {last_account_number :: number(), client_pid :: number()}).
 -record(account_dto, {account_number :: number(),
                      person_id :: number(),
                      given_name :: string(),
@@ -22,20 +22,24 @@ init(ReceiverNode) ->
     {ok, SubscriptionTimer} = timer:send_interval(10000, #update_subscription_timer{}),
     {ok, #state{ last_account_number = 0, receiver_node = ReceiverNode, subscription_timer = SubscriptionTimer }}.
 
+handle_info({welcome, WelcomeMessage, _NewAccounts}, State) ->
+    io:format("welcome message received:~s~n", [WelcomeMessage]),
+    {noreply, State};
+
 handle_info(#update_subscription_timer{}, State) ->
-    Result = gen_server:call({account_server, State#state.receiver_node}, #subscribe_message{last_account_number = State#state.last_account_number}),
-    {ok, LastAccountNumber} = handle_account_dtos(Result#account_dtos.account_dtos, State#state.last_account_number),
+    Results = gen_server:call({account_server, State#state.receiver_node}, #subscribe{last_account_number = State#state.last_account_number, client_pid = self()}),
+    
+    case Results of
+        ok -> {noreply, State};
+        [] -> 
+            io:format("empty account list received~n"),
+            {noreply, State};
+        _ ->
+            io:format("update subscription timer gen_server:call result:~s~n", [Results]),
+            {ok, LastAccountNumber} = handle_account_dtos(Results, State#state.last_account_number),
     NewState = create_new_state(State, LastAccountNumber), 
-    {noreply, NewState}.
-    % try gen_server:call({account_server, State#state.receiver_node}, #subscribe_message{last_account_number = State#state.last_account_number}) of
-    %     {reply, Result, _} ->
-    %         {ok, LastAccountNumber} = handle_account_dtos(Result#account_dtos.account_dtos, State#state.last_account_number),
-    %         NewState = create_new_state(State, LastAccountNumber), 
-    %         {noreply, NewState}
-    % catch _:_ ->
-    %     logger:info("Call to accounts_server failed!"),
-    %     {noreply, State}
-    % end.
+    {noreply, NewState}
+    end.
 
 create_new_state(State, NewLastAccountNumber) ->
     #state{ last_account_number = NewLastAccountNumber, receiver_node = State#state.receiver_node, subscription_timer = State#state.subscription_timer }.
