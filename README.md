@@ -38,4 +38,4 @@ You can set a short name via:
 $ rebar3 shell --sname=statements
 ```
 
-The web-frontend is served at http://localhost:8124/
+The web-frontend is served at http://localhost:8002/
