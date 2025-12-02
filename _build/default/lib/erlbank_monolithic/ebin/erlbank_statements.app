@@ -6,7 +6,7 @@
               {applications,[kernel,inets,xmerl,stdlib,sasl,logstasher,
                              cowboy]},
               {env,[]},
-              {modules,[business_logic,client,database,date_formatter,
+              {modules,[business_logic,client,date_formatter,
                         erlbank_statements_app,erlbank_statements_sup,
                         exchange_service,node_util,number_formatter,
                         web_frontend]},
