@@ -8,7 +8,7 @@
               {env,[]},
               {modules,[business_logic,client,database,date_formatter,
                         erlbank_statements_app,erlbank_statements_sup,
-                        event_server,exchange_service,node_util,
+                        event_server,event_sink,exchange_service,node_util,
                         number_formatter,web_frontend]},
               {licenses,["Apache 2.0"]},
               {links,[]}]}.

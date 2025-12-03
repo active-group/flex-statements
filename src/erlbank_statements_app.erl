@@ -25,6 +25,7 @@ start_cowboy() ->
 start(_StartType, _StartArgs) ->
     database:init_database(),
     start_cowboy(),
+    event_sink:start(),
     erlbank_statements_sup:start_link().
 
 stop(_State) ->
