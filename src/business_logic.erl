@@ -2,25 +2,17 @@
 
 -module(business_logic).
 -include("data.hrl").
--export([open_account/2, get_account/1, get_person/1, transfer/3, sort_transfers/1, get_transfers/1 ]).
+-export([get_account/1, get_person/1, transfer/4, sort_transfers/1, get_transfers/1, make_person/3, make_account/2]).
 
 
 %% Opens an account, that is creates a new account containing a new person 
 %% Writes them into database.
 
--spec open_account(binary(), binary()) -> #account{}.
-open_account(GivenName, Surname) ->
-    make_account(
-      make_person(
-        GivenName, Surname)
-     ).
-
 -spec get_account(account_number()) -> {ok, #account{}} | {error, any()}.
 get_account(AccountNumber) -> database:get_account(AccountNumber).
 
--spec make_person(binary(), binary()) -> #person{}.
-make_person(GivenName, Surname) ->
-    PersonId = database:unique_person_id(),
+-spec make_person(unique_id(), binary(), binary()) -> #person{}.
+make_person(PersonId, GivenName, Surname) ->
     Person = #person{id = PersonId,
                    given_name = GivenName,
                    surname = Surname},
@@ -30,9 +22,8 @@ make_person(GivenName, Surname) ->
 -spec get_person(unique_id()) -> {ok, #person{} | {error, any()}}.
 get_person(Id) -> database:get_person(Id).
 
--spec make_account(#person{}) -> #account{}.
-make_account(Person) ->
-    AccountNumber = database:unique_account_number(),
+-spec make_account(unique_id(), #person{}) -> #account{}.
+make_account(AccountNumber, Person) ->
     Account = #account{account_number = AccountNumber,
                    person_id = Person#person.id,
                    amount = 1000},
@@ -49,10 +40,10 @@ get_transfers(Id) ->
 %% Returns {ok, tid}, where tid is the id of the stored transfer
 %% or {error, insufficient_funds} when there is not enough money in the sender account.
 
--spec transfer(account_number(), account_number(), money()) -> 
+-spec transfer(unique_id(), account_number(), account_number(), money()) ->
      {error, sender_account_not_found | receiver_account_not_found | insufficient_funds}
    | {ok, unique_id()}.
-transfer(SenderAccountNumber, ReceiverAccountNumber, Amount) ->
+transfer(TransferId, SenderAccountNumber, ReceiverAccountNumber, Amount) ->
 
     TransferFunction =
       fun() -> 
@@ -68,7 +59,6 @@ transfer(SenderAccountNumber, ReceiverAccountNumber, Amount) ->
 
                 if
                     AccountSenderAmount - Amount >= 0 ->
-                        TransferId = database:unique_transfer_id(),
                         Transfer = #transfer{id = TransferId,
                                             timestamp = erlang:timestamp(),
                                             from_account_number = SenderAccountNumber,
