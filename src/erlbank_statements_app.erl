@@ -31,7 +31,8 @@ start(_StartType, _StartArgs) ->
     logger:info("Consuming accounts on: ~p~n", [AccountNode]),
     logger:info("Consuming transfers on: ~p~n", [TransferNode]),
 
-    event_sink:start(),
+    event_sink:start({ event_sender, AccountNode }),
+    event_sink:start({ transfers, TransferNode }),
     erlbank_statements_sup:start_link().
 
 stop(_State) ->
