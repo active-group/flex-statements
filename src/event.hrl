@@ -13,4 +13,4 @@
 -record(person_creation_event,
 {id :: unique_id(), given_name :: binary(), surname :: binary()}).
 -record(register,
-{}).
+{pid :: pid()}).
