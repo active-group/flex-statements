@@ -21,23 +21,19 @@ init(SourcePid) ->
   {ok, state}.
 
 -spec handle_call(any(), pid(), state()) -> {reply, any(), state()}.
-handle_call(#account_creation_event{}, _From, State) ->
-  case business_logic:get_person(#account_creation_event.person_id) of
+handle_call(#account_creation_event{person_id = PersonId, account_number = AccountNumber}, _From, State) ->
+  case business_logic:get_person(PersonId) of
     {error, _} -> {reply, {error, "Person not found"}, State};
-    {ok, Person} ->
-      {reply, {ok, business_logic:make_account(#account_creation_event.account_number, Person)}, State}
+    {ok, Person} -> 
+      business_logic:make_account(AccountNumber, Person),
+      {reply, ok, State}
   end;
-handle_call(#person_creation_event{}, _From, State) ->
-  {reply, { ok, business_logic:make_person(
-    #person_creation_event.id,
-    #person_creation_event.given_name,
-    #person_creation_event.surname)}, State};
-handle_call(#transfer_creation_event{}, _From, State) ->
-  {reply, {ok, business_logic:transfer(
-    #transfer_creation_event.id,
-    #transfer_creation_event.from_account_number,
-    #transfer_creation_event.to_account_number,
-    #transfer_creation_event.amount)}, State};
+handle_call(#person_creation_event{id = Id, given_name = GivenName, surname = Surname}, _From, State) ->
+  business_logic:make_person(Id, GivenName, Surname),
+  {reply, ok, State};
+handle_call(#transfer_creation_event{id = Id, from_account_number = From, to_account_number = To, amount = Amount}, _From, State) ->
+  business_logic:transfer(Id, From, To, Amount),
+  {reply, ok, State};
 handle_call(_Any, _From, State) ->
   {reply, ok, State}.
 
